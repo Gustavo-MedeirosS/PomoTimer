@@ -1,0 +1,32 @@
+package com.example.pomofocus.components
+
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
+import com.example.pomofocus.PomodoroState
+import com.example.pomofocus.R
+
+@Composable
+fun BottomText(pomodoroState: PomodoroState) {
+    Text(
+        text =
+        if (pomodoroState == PomodoroState.FOCUS) stringResource(id = R.string.txt_focus)
+        else stringResource(id = R.string.txt_break),
+        style = TextStyle(
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Normal,
+        )
+    )
+}
+
+@Preview
+@Composable
+private fun BottomTextPreview() {
+    BottomText(pomodoroState = PomodoroState.FOCUS)
+}
