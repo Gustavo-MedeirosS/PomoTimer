@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">PomoFocus</string>
+
+    <string name="btn_focus">Focus</string>
+    <string name="btn_short_break">Short break</string>
+    <string name="btn_long_break">Long break</string>
+    <string name="btn_start">Start</string>
+    <string name="btn_resume">Resume</string>
+    <string name="btn_pause">Pause</string>
+
+    <string name="txt_focus">Time to focus!</string>
+    <string name="txt_break">Time for a break!</string>
 </resources>
