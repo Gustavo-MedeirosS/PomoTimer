@@ -14,42 +14,48 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pomofocus.components.BottomText
 import com.example.pomofocus.components.ChronometerBox
 import com.example.pomofocus.components.ChronometerButtons
 import com.example.pomofocus.components.HeaderText
 import com.example.pomofocus.components.PomodoroStateButton
+import com.example.pomofocus.service.PomofocusService
+import com.example.pomofocus.service.ServiceHelper
 import com.example.pomofocus.ui.theme.GreenShortBreak
 import com.example.pomofocus.ui.theme.RedFocus
 import kotlinx.coroutines.delay
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun MainScreen(viewModel: MainViewModel = viewModel()) {
-    val totalTime by viewModel.totalTime.collectAsState()
-    val timer by viewModel.timer.collectAsState()
-    val isTimerRunning by viewModel.isTimerRunning.collectAsState()
-    val minutes by viewModel.minutes.collectAsState()
-    val seconds by viewModel.seconds.collectAsState()
-    val progressTimerIndicator by viewModel.progressTimerIndicator.collectAsState()
-    val pomodoroState by viewModel.pomodoroState.collectAsState()
+fun MainScreen(pomofocusService: PomofocusService) {
+    val context = LocalContext.current
+    val totalTime by pomofocusService.totalTime.collectAsState()
+    val timer by pomofocusService.timer.collectAsState()
+    val isTimerRunning by pomofocusService.isTimerRunning.collectAsState()
+    val minutes by pomofocusService.minutes.collectAsState()
+    val seconds by pomofocusService.seconds.collectAsState()
+    val progressTimerIndicator by pomofocusService.progressTimerIndicator.collectAsState()
+    val pomodoroState by pomofocusService.pomofocusState.collectAsState()
 
     LaunchedEffect(key1 = timer, key2 = isTimerRunning) {
         if (timer > 0 && isTimerRunning) {
             delay(1000L)
-            viewModel.decreaseTimer()
+            pomofocusService.decreaseTimer()
         } else if (timer == 0) {
-            viewModel.finishTimer()
+            ServiceHelper.triggerForegroundService(
+                context = context,
+                action = Constants.ACTION_SERVICE_FINISH
+            )
         }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        val currentColor = if (pomodoroState == PomodoroState.FOCUS) RedFocus else GreenShortBreak
+        val currentColor = if (pomodoroState == PomofocusState.FOCUS) RedFocus else GreenShortBreak
 
         Column(
             modifier = Modifier
@@ -73,12 +79,12 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                 ) {
                     PomodoroStateButton(
                         onClick = {},
-                        isCurrentState = pomodoroState == PomodoroState.FOCUS,
+                        isCurrentState = pomodoroState == PomofocusState.FOCUS,
                         stringRes = R.string.btn_focus
                     )
                     PomodoroStateButton(
                         onClick = {},
-                        isCurrentState = pomodoroState == PomodoroState.SHORT_BREAK,
+                        isCurrentState = pomodoroState == PomofocusState.SHORT_BREAK,
                         stringRes = R.string.btn_short_break
                     )
 
@@ -97,16 +103,27 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                     totalTime = totalTime,
                     onMainButtonClick = {
                         if (isTimerRunning) {
-                            viewModel.pauseTimer()
+                            ServiceHelper.triggerForegroundService(
+                                context = context,
+                                action = Constants.ACTION_SERVICE_PAUSE
+                            )
                         } else {
-                            viewModel.startTimer()
+                            ServiceHelper.triggerForegroundService(
+                                context = context,
+                                action = Constants.ACTION_SERVICE_START
+                            )
                         }
                     },
-                    onPlayerNextClick = { viewModel.finishTimer() }
+                    onPlayerNextClick = {
+                        ServiceHelper.triggerForegroundService(
+                            context = context,
+                            action = Constants.ACTION_SERVICE_FINISH
+                        )
+                    }
                 )
             }
 
-            BottomText(pomodoroState = pomodoroState)
+            BottomText(pomofocusState = pomodoroState)
         }
     }
 }
@@ -114,5 +131,5 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
 @Preview
 @Composable
 private fun MainScreenPreview() {
-    MainScreen()
+//    MainScreen()
 }

@@ -8,14 +8,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.example.pomofocus.PomodoroState
+import com.example.pomofocus.PomofocusState
 import com.example.pomofocus.R
 
 @Composable
-fun BottomText(pomodoroState: PomodoroState) {
+fun BottomText(pomofocusState: PomofocusState) {
     Text(
         text =
-        if (pomodoroState == PomodoroState.FOCUS) stringResource(id = R.string.txt_focus)
+        if (pomofocusState == PomofocusState.FOCUS) stringResource(id = R.string.txt_focus)
         else stringResource(id = R.string.txt_break),
         style = TextStyle(
             color = Color.White,
@@ -28,5 +28,5 @@ fun BottomText(pomodoroState: PomodoroState) {
 @Preview
 @Composable
 private fun BottomTextPreview() {
-    BottomText(pomodoroState = PomodoroState.FOCUS)
+    BottomText(pomofocusState = PomofocusState.FOCUS)
 }
