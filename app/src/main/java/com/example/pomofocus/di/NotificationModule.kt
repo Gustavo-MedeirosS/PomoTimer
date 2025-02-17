@@ -28,8 +28,7 @@ object NotificationModule {
             .setContentText("00:00")
             .setShowWhen(false)
             .setOngoing(true)
-//            .setProgress()
-            .addAction(0, "Start", ServiceHelper.startResumePendingIntent(context = context))
+            .addAction(0, "Start", ServiceHelper.resumePendingIntent(context = context))
             .setContentIntent(ServiceHelper.clickPendingIntent(context = context))
 
         return builder

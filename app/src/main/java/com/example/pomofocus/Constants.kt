@@ -19,5 +19,5 @@ object Constants {
     const val CLICK_REQUEST_CODE = 100
     const val FINISH_REQUEST_CODE = 101
     const val PAUSE_REQUEST_CODE = 102
-    const val RESUME_REQUEST_CODE = 103
+    const val START_RESUME_REQUEST_CODE = 103
 }

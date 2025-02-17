@@ -1,4 +1,4 @@
-package com.example.pomofocus.components
+package com.example.pomofocus.ui.components
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent

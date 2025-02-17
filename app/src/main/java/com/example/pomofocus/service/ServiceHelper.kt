@@ -3,13 +3,15 @@ package com.example.pomofocus.service
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.example.pomofocus.Constants.ACTION_SERVICE_FINISH
+import com.example.pomofocus.Constants.ACTION_SERVICE_PAUSE
+import com.example.pomofocus.Constants.ACTION_SERVICE_RESUME
+import com.example.pomofocus.Constants.ACTION_SERVICE_START
 import com.example.pomofocus.Constants.CLICK_REQUEST_CODE
 import com.example.pomofocus.Constants.FINISH_REQUEST_CODE
-import com.example.pomofocus.Constants.RESUME_REQUEST_CODE
 import com.example.pomofocus.Constants.PAUSE_REQUEST_CODE
-import com.example.pomofocus.Constants.TIMER_STATE
+import com.example.pomofocus.Constants.START_RESUME_REQUEST_CODE
 import com.example.pomofocus.MainActivity
-import com.example.pomofocus.TimerState
 
 object ServiceHelper {
 
@@ -18,17 +20,27 @@ object ServiceHelper {
     // start timer
     fun clickPendingIntent(context: Context): PendingIntent {
         val startIntent = Intent(context, MainActivity::class.java).apply {
-            putExtra(TIMER_STATE, TimerState.STARTED)
+            action = ACTION_SERVICE_START
         }
         return PendingIntent.getService(
             context, CLICK_REQUEST_CODE, startIntent, FLAG
         )
     }
 
+    // start timer
+    fun startPendingIntent(context: Context): PendingIntent {
+        val startIntent = Intent(context, PomofocusService::class.java).apply {
+            action = ACTION_SERVICE_START
+        }
+        return PendingIntent.getService(
+            context, START_RESUME_REQUEST_CODE, startIntent, FLAG
+        )
+    }
+
     // pause timer
     fun pausePendingIntent(context: Context): PendingIntent {
         val pauseIntent = Intent(context, PomofocusService::class.java).apply {
-            putExtra(TIMER_STATE, TimerState.PAUSED)
+            action = ACTION_SERVICE_PAUSE
         }
         return PendingIntent.getService(
             context, PAUSE_REQUEST_CODE, pauseIntent, FLAG
@@ -36,19 +48,19 @@ object ServiceHelper {
     }
 
     // resume timer
-    fun startResumePendingIntent(context: Context): PendingIntent {
-        val startResumeIntent = Intent(context, PomofocusService::class.java).apply {
-            putExtra(TIMER_STATE, TimerState.STARTED)
+    fun resumePendingIntent(context: Context): PendingIntent {
+        val resumeIntent = Intent(context, PomofocusService::class.java).apply {
+            action = ACTION_SERVICE_RESUME
         }
         return PendingIntent.getService(
-            context, RESUME_REQUEST_CODE, startResumeIntent, FLAG
+            context, START_RESUME_REQUEST_CODE, resumeIntent, FLAG
         )
     }
 
     // finish timer
     fun finishPendingIntent(context: Context): PendingIntent {
         val finishIntent = Intent(context, PomofocusService::class.java).apply {
-            putExtra(TIMER_STATE, TimerState.IDLE)
+            action = ACTION_SERVICE_FINISH
         }
         return PendingIntent.getService(
             context, FINISH_REQUEST_CODE, finishIntent, FLAG

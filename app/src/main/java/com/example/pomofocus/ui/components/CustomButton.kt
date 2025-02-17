@@ -1,4 +1,4 @@
-package com.example.pomofocus.components
+package com.example.pomofocus.ui.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape

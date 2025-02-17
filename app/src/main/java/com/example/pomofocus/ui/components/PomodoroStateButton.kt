@@ -1,4 +1,4 @@
-package com.example.pomofocus.components
+package com.example.pomofocus.ui.components
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues

@@ -17,9 +17,7 @@ import com.example.pomofocus.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.pomofocus.Constants.NOTIFICATION_CHANNEL_NAME
 import com.example.pomofocus.Constants.NOTIFICATION_ID
 import com.example.pomofocus.Constants.SHORT_BREAK_TIMER
-import com.example.pomofocus.Constants.TIMER_STATE
 import com.example.pomofocus.PomofocusState
-import com.example.pomofocus.TimerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -50,34 +48,13 @@ class PomofocusService : Service() {
     override fun onBind(intent: Intent?) = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // actions from screen
-        when (intent?.getStringExtra(TIMER_STATE)) {
-            TimerState.STARTED.name -> {
-                startResumeTimer()
-                startForegroundService()
-                setPauseButton()
-                setFinishButton()
-            }
-
-            TimerState.PAUSED.name -> {
-                pauseTimer()
-                setResumeButton()
-            }
-
-            TimerState.IDLE.name -> {
-                finishTimer()
-                removeFinishButton()
-                setStartButton()
-                stopForegroundService()
-            }
-        }
-
-        // actions from notification
+        // actions from screen and notification
         intent?.action.let { action ->
             when (action) {
                 ACTION_SERVICE_START -> {
                     startResumeTimer()
                     startForegroundService()
+                    setPauseButton()
                     setFinishButton()
                 }
 
@@ -89,14 +66,14 @@ class PomofocusService : Service() {
                 ACTION_SERVICE_RESUME -> {
                     startResumeTimer()
                     setPauseButton()
-                    setFinishButton()
                 }
 
                 ACTION_SERVICE_FINISH -> {
                     finishTimer()
-                    removeFinishButton()
                     setStartButton()
-                    stopForegroundService()
+//                    stopForegroundService()
+                    removeFinishButton()
+                    updateNotification()
                 }
             }
         }
@@ -134,6 +111,7 @@ class PomofocusService : Service() {
             setFocusTimeTitle()
         }
         formatTime()
+        setProgressBarNotification()
     }
 
     private fun formatTime() {
@@ -145,6 +123,7 @@ class PomofocusService : Service() {
         progressTimerIndicator.update {
             1f - (timer.value.toFloat() / totalTime.value)
         }
+        setProgressBarNotification()
     }
 
     @SuppressLint("ForegroundServiceType")
@@ -190,7 +169,7 @@ class PomofocusService : Service() {
         notificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
-                0, "Resume", ServiceHelper.startResumePendingIntent(this)
+                0, "Resume", ServiceHelper.resumePendingIntent(this)
             )
         )
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
@@ -214,7 +193,7 @@ class PomofocusService : Service() {
         notificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
-                0, "Start", ServiceHelper.clickPendingIntent(this)
+                0, "Start", ServiceHelper.startPendingIntent(this)
             )
         )
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
@@ -222,13 +201,16 @@ class PomofocusService : Service() {
 
     @SuppressLint("RestrictedApi")
     private fun setFinishButton() {
-        notificationBuilder.mActions.add(
-            1,
-            NotificationCompat.Action(
-                0, "Finish", ServiceHelper.finishPendingIntent(this)
+        val actionsListSize = notificationBuilder.mActions.size
+        if (actionsListSize == 1) {
+            notificationBuilder.mActions.add(
+                1,
+                NotificationCompat.Action(
+                    0, "Finish", ServiceHelper.finishPendingIntent(this)
+                )
             )
-        )
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+        }
     }
 
     @SuppressLint("RestrictedApi")
@@ -251,6 +233,17 @@ class PomofocusService : Service() {
             NOTIFICATION_ID,
             notificationBuilder.setContentTitle(
                 "Break Time"
+            ).build()
+        )
+    }
+
+    private fun setProgressBarNotification() {
+        notificationManager.notify(
+            NOTIFICATION_ID,
+            notificationBuilder.setProgress(
+                totalTime.value,
+                totalTime.value - timer.value,
+                false
             ).build()
         )
     }

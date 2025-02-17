@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.pomofocus.components.BottomText
-import com.example.pomofocus.components.ChronometerBox
-import com.example.pomofocus.components.ChronometerButtons
-import com.example.pomofocus.components.HeaderText
-import com.example.pomofocus.components.PomodoroStateButton
+import com.example.pomofocus.ui.components.BottomText
+import com.example.pomofocus.ui.components.ChronometerBox
+import com.example.pomofocus.ui.components.ChronometerButtons
+import com.example.pomofocus.ui.components.HeaderText
+import com.example.pomofocus.ui.components.PomodoroStateButton
 import com.example.pomofocus.service.PomofocusService
 import com.example.pomofocus.service.ServiceHelper
 import com.example.pomofocus.ui.theme.GreenShortBreak
@@ -32,6 +32,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun MainScreen(pomofocusService: PomofocusService) {
     val context = LocalContext.current
+//    val windowSizeClass =
     val totalTime by pomofocusService.totalTime.collectAsState()
     val timer by pomofocusService.timer.collectAsState()
     val isTimerRunning by pomofocusService.isTimerRunning.collectAsState()
