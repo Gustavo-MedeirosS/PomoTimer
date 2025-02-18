@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,15 +26,19 @@ import com.example.pomofocus.ui.components.HeaderText
 import com.example.pomofocus.ui.components.PomodoroStateButton
 import com.example.pomofocus.service.PomofocusService
 import com.example.pomofocus.service.ServiceHelper
+import com.example.pomofocus.ui.layout.LandscapeLayout
+import com.example.pomofocus.ui.layout.PortraitLayout
 import com.example.pomofocus.ui.theme.GreenShortBreak
 import com.example.pomofocus.ui.theme.RedFocus
 import kotlinx.coroutines.delay
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun MainScreen(pomofocusService: PomofocusService) {
+fun MainScreen(
+    pomofocusService: PomofocusService,
+    windowSizeClass: WindowSizeClass
+) {
     val context = LocalContext.current
-//    val windowSizeClass =
     val totalTime by pomofocusService.totalTime.collectAsState()
     val timer by pomofocusService.timer.collectAsState()
     val isTimerRunning by pomofocusService.isTimerRunning.collectAsState()
@@ -58,73 +64,35 @@ fun MainScreen(pomofocusService: PomofocusService) {
     ) { innerPadding ->
         val currentColor = if (pomodoroState == PomofocusState.FOCUS) RedFocus else GreenShortBreak
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(currentColor)
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
-        ) {
-            HeaderText()
-
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(36.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = Modifier,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    PomodoroStateButton(
-                        onClick = {},
-                        isCurrentState = pomodoroState == PomofocusState.FOCUS,
-                        stringRes = R.string.btn_focus
-                    )
-                    PomodoroStateButton(
-                        onClick = {},
-                        isCurrentState = pomodoroState == PomofocusState.SHORT_BREAK,
-                        stringRes = R.string.btn_short_break
-                    )
-
-                }
-
-                ChronometerBox(
+        when (windowSizeClass.widthSizeClass) {
+            WindowWidthSizeClass.Compact -> {
+                PortraitLayout(
+                    context = LocalContext.current,
+                    currentColor = currentColor,
+                    innerPadding = innerPadding,
+                    pomodoroState = pomodoroState,
+                    isTimerRunning = isTimerRunning,
+                    totalTime = totalTime,
+                    timer = timer,
                     minutes = minutes,
                     seconds = seconds,
-                    progressTimerIndicator = progressTimerIndicator
-                )
-
-                ChronometerButtons(
-                    currentColor = currentColor,
-                    isTimerRunning = isTimerRunning,
-                    timer = timer,
-                    totalTime = totalTime,
-                    onMainButtonClick = {
-                        if (isTimerRunning) {
-                            ServiceHelper.triggerForegroundService(
-                                context = context,
-                                action = Constants.ACTION_SERVICE_PAUSE
-                            )
-                        } else {
-                            ServiceHelper.triggerForegroundService(
-                                context = context,
-                                action = Constants.ACTION_SERVICE_START
-                            )
-                        }
-                    },
-                    onPlayerNextClick = {
-                        ServiceHelper.triggerForegroundService(
-                            context = context,
-                            action = Constants.ACTION_SERVICE_FINISH
-                        )
-                    }
+                    progressTimerIndicator = progressTimerIndicator,
                 )
             }
-
-            BottomText(pomofocusState = pomodoroState)
+            WindowWidthSizeClass.Medium, WindowWidthSizeClass.Expanded -> {
+                LandscapeLayout(
+                    context = LocalContext.current,
+                    currentColor = currentColor,
+                    innerPadding = innerPadding,
+                    pomodoroState = pomodoroState,
+                    isTimerRunning = isTimerRunning,
+                    totalTime = totalTime,
+                    timer = timer,
+                    minutes = minutes,
+                    seconds = seconds,
+                    progressTimerIndicator = progressTimerIndicator,
+                )
+            }
         }
     }
 }
