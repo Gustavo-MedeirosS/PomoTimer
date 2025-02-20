@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.media.RingtoneManager
 import android.os.Binder
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -12,10 +13,13 @@ import com.example.pomofocus.Constants.ACTION_SERVICE_FINISH
 import com.example.pomofocus.Constants.ACTION_SERVICE_PAUSE
 import com.example.pomofocus.Constants.ACTION_SERVICE_RESUME
 import com.example.pomofocus.Constants.ACTION_SERVICE_START
+import com.example.pomofocus.Constants.ALARM_NOTIFICATION_ID
 import com.example.pomofocus.Constants.FOCUS_TIMER
-import com.example.pomofocus.Constants.NOTIFICATION_CHANNEL_ID
-import com.example.pomofocus.Constants.NOTIFICATION_CHANNEL_NAME
-import com.example.pomofocus.Constants.NOTIFICATION_ID
+import com.example.pomofocus.Constants.SILENT_NOTIFICATION_CHANNEL_ID
+import com.example.pomofocus.Constants.NOTIFICATION_TIMER_UPDATES_NAME
+import com.example.pomofocus.Constants.SILENT_NOTIFICATION_ID
+import com.example.pomofocus.Constants.ALARM_NOTIFICATION_CHANNEL_ID
+import com.example.pomofocus.Constants.NOTIFICATION_TIMER_FINISHED_NAME
 import com.example.pomofocus.Constants.SHORT_BREAK_TIMER
 import com.example.pomofocus.PomofocusState
 import dagger.hilt.android.AndroidEntryPoint
@@ -70,10 +74,10 @@ class PomofocusService : Service() {
 
                 ACTION_SERVICE_FINISH -> {
                     finishTimer()
-                    setStartButton()
 //                    stopForegroundService()
                     removeFinishButton()
-                    updateNotification()
+                    updateSilentNotification()
+                    updateAlarmNotification()
                 }
             }
         }
@@ -85,7 +89,7 @@ class PomofocusService : Service() {
         timer.update { it - 1 }
         formatTime()
         calculateProgressTimerIndicator()
-        updateNotification()
+        updateSilentNotification()
     }
 
     private fun startResumeTimer() {
@@ -128,33 +132,76 @@ class PomofocusService : Service() {
 
     @SuppressLint("ForegroundServiceType")
     private fun startForegroundService() {
-        createNotificationChannel()
-        startForeground(NOTIFICATION_ID, notificationBuilder.build())
+        createNotificationChannels()
+        startForeground(SILENT_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     private fun stopForegroundService() {
-        notificationManager.cancel(NOTIFICATION_ID)
+        notificationManager.cancel(SILENT_NOTIFICATION_ID)
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
 
-    private fun createNotificationChannel() {
+    private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
-                notificationManager.importance
-            )
-            notificationManager.createNotificationChannel(channel)
+            val silentChannel = NotificationChannel(
+                SILENT_NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_TIMER_UPDATES_NAME,
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                enableVibration(false)
+            }
+
+            val alertChannel = NotificationChannel(
+                ALARM_NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_TIMER_FINISHED_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 500, 500, 500)
+                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM), null)
+            }
+
+            notificationManager.createNotificationChannels(listOf(silentChannel, alertChannel))
         }
     }
 
-    private fun updateNotification() {
+    private fun updateSilentNotification() {
+        if (totalTime.value == timer.value) {
+            setStartButton()
+        }
         notificationManager.notify(
-            NOTIFICATION_ID,
-            notificationBuilder.setContentText(
-                formatTimeForNotification()
-            ).build()
+            SILENT_NOTIFICATION_ID,
+            notificationBuilder
+                .setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
+                .setContentText(formatTimeForNotification())
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build()
+        )
+    }
+
+    private fun updateAlarmNotification() {
+        notificationManager.cancel(ALARM_NOTIFICATION_ID)
+        notificationManager.notify(
+            ALARM_NOTIFICATION_ID,
+            notificationBuilder
+                .setChannelId(ALARM_NOTIFICATION_CHANNEL_ID)
+                .setContentTitle(
+                    if (pomofocusState.value == PomofocusState.FOCUS) "Focus time!"
+                    else "Break time!"
+                )
+                .setContentText(
+                    if (pomofocusState.value == PomofocusState.FOCUS) "It's time to go back to work"
+                    else "It's time to take a breath"
+                )
+                .setOngoing(false)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setProgress(0, 0, false)
+                .build()
         )
     }
 
@@ -165,6 +212,7 @@ class PomofocusService : Service() {
 
     @SuppressLint("RestrictedApi")
     private fun setResumeButton() {
+        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
         notificationBuilder.mActions.removeAt(0)
         notificationBuilder.mActions.add(
             0,
@@ -172,23 +220,27 @@ class PomofocusService : Service() {
                 0, "Resume", ServiceHelper.resumePendingIntent(this)
             )
         )
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     @SuppressLint("RestrictedApi")
     private fun setPauseButton() {
-        notificationBuilder.mActions.removeAt(0)
+        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
+        if (notificationBuilder.mActions.size > 0) {
+            notificationBuilder.mActions.removeAt(0)
+        }
         notificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
                 0, "Pause", ServiceHelper.pausePendingIntent(this)
             )
         )
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     @SuppressLint("RestrictedApi")
     private fun setStartButton() {
+        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
         notificationBuilder.mActions.removeAt(0)
         notificationBuilder.mActions.add(
             0,
@@ -196,11 +248,12 @@ class PomofocusService : Service() {
                 0, "Start", ServiceHelper.startPendingIntent(this)
             )
         )
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+//        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     @SuppressLint("RestrictedApi")
     private fun setFinishButton() {
+        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
         val actionsListSize = notificationBuilder.mActions.size
         if (actionsListSize == 1) {
             notificationBuilder.mActions.add(
@@ -209,37 +262,34 @@ class PomofocusService : Service() {
                     0, "Finish", ServiceHelper.finishPendingIntent(this)
                 )
             )
-            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+            notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
         }
     }
 
     @SuppressLint("RestrictedApi")
     private fun removeFinishButton() {
+        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
         notificationBuilder.mActions.removeAt(1)
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     private fun setFocusTimeTitle() {
         notificationManager.notify(
-            NOTIFICATION_ID,
-            notificationBuilder.setContentTitle(
-                "Focus Time"
-            ).build()
+            SILENT_NOTIFICATION_ID,
+            notificationBuilder.setContentTitle("Focus Time").build()
         )
     }
 
     private fun setBreakTimeTitle() {
         notificationManager.notify(
-            NOTIFICATION_ID,
-            notificationBuilder.setContentTitle(
-                "Break Time"
-            ).build()
+            SILENT_NOTIFICATION_ID,
+            notificationBuilder.setContentTitle("Break Time").build()
         )
     }
 
     private fun setProgressBarNotification() {
         notificationManager.notify(
-            NOTIFICATION_ID,
+            SILENT_NOTIFICATION_ID,
             notificationBuilder.setProgress(
                 totalTime.value,
                 totalTime.value - timer.value,

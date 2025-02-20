@@ -17,13 +17,11 @@ object ServiceHelper {
 
     private const val FLAG = PendingIntent.FLAG_IMMUTABLE
 
-    // start timer
+    // click intent
     fun clickPendingIntent(context: Context): PendingIntent {
-        val startIntent = Intent(context, MainActivity::class.java).apply {
-            action = ACTION_SERVICE_START
-        }
-        return PendingIntent.getService(
-            context, CLICK_REQUEST_CODE, startIntent, FLAG
+        val clickIntent = Intent(context, MainActivity::class.java)
+        return PendingIntent.getActivity(
+            context, CLICK_REQUEST_CODE, clickIntent, FLAG
         )
     }
 

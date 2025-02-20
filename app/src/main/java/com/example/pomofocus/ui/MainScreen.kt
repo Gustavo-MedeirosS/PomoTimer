@@ -1,12 +1,7 @@
-package com.example.pomofocus
+package com.example.pomofocus.ui
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -14,16 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.pomofocus.ui.components.BottomText
-import com.example.pomofocus.ui.components.ChronometerBox
-import com.example.pomofocus.ui.components.ChronometerButtons
-import com.example.pomofocus.ui.components.HeaderText
-import com.example.pomofocus.ui.components.PomodoroStateButton
+import com.example.pomofocus.Constants
+import com.example.pomofocus.PomofocusState
 import com.example.pomofocus.service.PomofocusService
 import com.example.pomofocus.service.ServiceHelper
 import com.example.pomofocus.ui.layout.LandscapeLayout

@@ -22,13 +22,13 @@ object NotificationModule {
     fun provideNotificationBuilder(
         @ApplicationContext context: Context
     ): NotificationCompat.Builder {
-        val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context, Constants.SILENT_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.timer_icon)
             .setContentTitle("Focus time")
             .setContentText("00:00")
             .setShowWhen(false)
-            .setOngoing(true)
-            .addAction(0, "Start", ServiceHelper.resumePendingIntent(context = context))
+//            .setOngoing(true)
+//            .addAction(0, "Start", ServiceHelper.startPendingIntent(context = context))
             .setContentIntent(ServiceHelper.clickPendingIntent(context = context))
 
         return builder

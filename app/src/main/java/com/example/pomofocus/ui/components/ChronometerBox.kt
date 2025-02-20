@@ -2,6 +2,7 @@ package com.example.pomofocus.ui.components
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -14,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +35,11 @@ fun ChronometerBox(
     seconds: Int,
     progressTimerIndicator: Float
 ) {
+    val circularAnimationState by animateFloatAsState(
+        targetValue = progressTimerIndicator,
+        label = "Circular Progress Animation"
+    )
+
     Box(
         modifier = Modifier
             .clip(shape = CircleShape)
@@ -80,7 +87,7 @@ fun ChronometerBox(
         }
 
         CircularProgressIndicator(
-            progress = { progressTimerIndicator },
+            progress = { circularAnimationState },
             modifier = Modifier.fillMaxSize(),
             color = Color.White,
             strokeWidth = 5.dp,
