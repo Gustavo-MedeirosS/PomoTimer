@@ -13,15 +13,16 @@ import com.example.pomofocus.Constants.ACTION_SERVICE_FINISH
 import com.example.pomofocus.Constants.ACTION_SERVICE_PAUSE
 import com.example.pomofocus.Constants.ACTION_SERVICE_RESUME
 import com.example.pomofocus.Constants.ACTION_SERVICE_START
+import com.example.pomofocus.Constants.ALARM_NOTIFICATION_CHANNEL_ID
 import com.example.pomofocus.Constants.ALARM_NOTIFICATION_ID
 import com.example.pomofocus.Constants.FOCUS_TIMER
-import com.example.pomofocus.Constants.SILENT_NOTIFICATION_CHANNEL_ID
-import com.example.pomofocus.Constants.NOTIFICATION_TIMER_UPDATES_NAME
-import com.example.pomofocus.Constants.SILENT_NOTIFICATION_ID
-import com.example.pomofocus.Constants.ALARM_NOTIFICATION_CHANNEL_ID
 import com.example.pomofocus.Constants.NOTIFICATION_TIMER_FINISHED_NAME
+import com.example.pomofocus.Constants.NOTIFICATION_TIMER_UPDATES_NAME
 import com.example.pomofocus.Constants.SHORT_BREAK_TIMER
+import com.example.pomofocus.Constants.SILENT_NOTIFICATION_CHANNEL_ID
+import com.example.pomofocus.Constants.SILENT_NOTIFICATION_ID
 import com.example.pomofocus.PomofocusState
+import com.example.pomofocus.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -58,6 +59,7 @@ class PomofocusService : Service() {
                 ACTION_SERVICE_START -> {
                     startResumeTimer()
                     startForegroundService()
+                    if (pomofocusState.value == PomofocusState.FOCUS) setFocusTimeTitle() else setBreakTimeTitle()
                     setPauseButton()
                     setFinishButton()
                 }
@@ -207,12 +209,12 @@ class PomofocusService : Service() {
             notificationBuilder
                 .setChannelId(ALARM_NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(
-                    if (pomofocusState.value == PomofocusState.FOCUS) "Focus time!"
-                    else "Break time!"
+                    if (pomofocusState.value == PomofocusState.FOCUS) applicationContext.getString(R.string.ntf_alarm_title_focus)
+                    else applicationContext.getString(R.string.ntf_alarm_title_break)
                 )
                 .setContentText(
-                    if (pomofocusState.value == PomofocusState.FOCUS) "It's time to go back to work"
-                    else "It's time to take a breath"
+                    if (pomofocusState.value == PomofocusState.FOCUS) applicationContext.getString(R.string.ntf_msg_focus)
+                    else applicationContext.getString(R.string.ntf_msg_break)
                 )
                 .setOngoing(false)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -235,7 +237,9 @@ class PomofocusService : Service() {
         notificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
-                0, "Resume", ServiceHelper.resumePendingIntent(this)
+                0,
+                applicationContext.getString(R.string.btn_resume),
+                ServiceHelper.resumePendingIntent(this)
             )
         )
         notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
@@ -250,7 +254,9 @@ class PomofocusService : Service() {
         notificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
-                0, "Pause", ServiceHelper.pausePendingIntent(this)
+                0,
+                applicationContext.getString(R.string.btn_pause),
+                ServiceHelper.pausePendingIntent(this)
             )
         )
         notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
@@ -265,7 +271,9 @@ class PomofocusService : Service() {
         notificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
-                0, "Start", ServiceHelper.startPendingIntent(this)
+                0,
+                applicationContext.getString(R.string.btn_start),
+                ServiceHelper.startPendingIntent(this)
             )
         )
 //        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
@@ -279,7 +287,9 @@ class PomofocusService : Service() {
             notificationBuilder.mActions.add(
                 1,
                 NotificationCompat.Action(
-                    0, "Finish", ServiceHelper.finishPendingIntent(this)
+                    0,
+                    applicationContext.getString(R.string.btn_finish),
+                    ServiceHelper.finishPendingIntent(this)
                 )
             )
             notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
@@ -298,14 +308,18 @@ class PomofocusService : Service() {
     private fun setFocusTimeTitle() {
         notificationManager.notify(
             SILENT_NOTIFICATION_ID,
-            notificationBuilder.setContentTitle("Focus Time").build()
+            notificationBuilder.setContentTitle(
+                applicationContext.getString(R.string.ntf_silent_title_focus)
+            ).build()
         )
     }
 
     private fun setBreakTimeTitle() {
         notificationManager.notify(
             SILENT_NOTIFICATION_ID,
-            notificationBuilder.setContentTitle("Break Time").build()
+            notificationBuilder.setContentTitle(
+                applicationContext.getString(R.string.ntf_silent_title_break)
+            ).build()
         )
     }
 
