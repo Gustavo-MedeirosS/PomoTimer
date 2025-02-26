@@ -7,7 +7,11 @@
     <string name="btn_start">Start</string>
     <string name="btn_resume">Resume</string>
     <string name="btn_pause">Pause</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="btn_cancel">Cancel</string>
 
     <string name="txt_focus">Time to focus!</string>
     <string name="txt_break">Time for a break!</string>
+    <string name="txt_alert_change_to_focus">The break timer is running, are you sure to change to Focus?</string>
+    <string name="txt_alert_change_to_break">The focus timer is running, are you sure to change to Break?</string>
 </resources>

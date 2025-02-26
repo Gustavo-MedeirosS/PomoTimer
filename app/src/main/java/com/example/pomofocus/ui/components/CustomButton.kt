@@ -22,13 +22,17 @@ fun CustomButton(
     containerColor: Color,
     contentColor: Color,
     contentPadding: PaddingValues,
+    enabled: Boolean = true,
     content: @Composable () -> Unit
 ) {
     Button(
         onClick = { onClick() },
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
-            contentColor = contentColor
+            contentColor = contentColor,
+            disabledContainerColor = containerColor,
+            disabledContentColor = contentColor
         ),
         shape = RoundedCornerShape(15),
         contentPadding = contentPadding,

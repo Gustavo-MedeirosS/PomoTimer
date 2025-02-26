@@ -16,6 +16,7 @@ import com.example.pomofocus.Constants
 import com.example.pomofocus.PomofocusState
 import com.example.pomofocus.service.PomofocusService
 import com.example.pomofocus.service.ServiceHelper
+import com.example.pomofocus.ui.components.AlertDialog
 import com.example.pomofocus.ui.layout.LandscapeLayout
 import com.example.pomofocus.ui.layout.PortraitLayout
 import com.example.pomofocus.ui.theme.GreenShortBreak
@@ -36,6 +37,7 @@ fun MainScreen(
     val seconds by pomofocusService.seconds.collectAsState()
     val progressTimerIndicator by pomofocusService.progressTimerIndicator.collectAsState()
     val pomodoroState by pomofocusService.pomofocusState.collectAsState()
+    val isDialogOpened by pomofocusService.isDialogOpened.collectAsState()
 
     LaunchedEffect(key1 = timer, key2 = isTimerRunning) {
         if (timer > 0 && isTimerRunning) {
@@ -54,6 +56,14 @@ fun MainScreen(
     ) { innerPadding ->
         val currentColor = if (pomodoroState == PomofocusState.FOCUS) RedFocus else GreenShortBreak
 
+        if (isDialogOpened) {
+            AlertDialog(
+                onDismissRequest = { pomofocusService.closeAlertDialog() },
+                onConfirmClick = { pomofocusService.changePomofocusState() },
+                pomofocusState = pomodoroState
+            )
+        }
+
         when (windowSizeClass.widthSizeClass) {
             WindowWidthSizeClass.Compact -> {
                 PortraitLayout(
@@ -61,6 +71,13 @@ fun MainScreen(
                     currentColor = currentColor,
                     innerPadding = innerPadding,
                     pomodoroState = pomodoroState,
+                    onPomofocusButtonStateClick = {
+                        if (isTimerRunning) {
+                            pomofocusService.openAlertDialog()
+                        } else {
+                            pomofocusService.changePomofocusState()
+                        }
+                    },
                     isTimerRunning = isTimerRunning,
                     totalTime = totalTime,
                     timer = timer,
@@ -69,12 +86,20 @@ fun MainScreen(
                     progressTimerIndicator = progressTimerIndicator,
                 )
             }
+
             WindowWidthSizeClass.Medium, WindowWidthSizeClass.Expanded -> {
                 LandscapeLayout(
                     context = LocalContext.current,
                     currentColor = currentColor,
                     innerPadding = innerPadding,
                     pomodoroState = pomodoroState,
+                    onPomofocusButtonStateClick = {
+                        if (isTimerRunning) {
+                            pomofocusService.openAlertDialog()
+                        } else {
+                            pomofocusService.changePomofocusState()
+                        }
+                    },
                     isTimerRunning = isTimerRunning,
                     totalTime = totalTime,
                     timer = timer,

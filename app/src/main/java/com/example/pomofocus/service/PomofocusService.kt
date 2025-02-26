@@ -40,6 +40,7 @@ class PomofocusService : Service() {
     val totalTime = MutableStateFlow(FOCUS_TIMER)
     val timer = MutableStateFlow(totalTime.value)
     val isTimerRunning = MutableStateFlow(false)
+    val isDialogOpened = MutableStateFlow(false)
 
     val minutes = MutableStateFlow(timer.value / 60)
     val seconds = MutableStateFlow(timer.value % 60)
@@ -47,7 +48,6 @@ class PomofocusService : Service() {
     val progressTimerIndicator = MutableStateFlow(0f)
 
     val pomofocusState = MutableStateFlow(PomofocusState.FOCUS)
-
 
     override fun onBind(intent: Intent?) = binder
 
@@ -116,6 +116,10 @@ class PomofocusService : Service() {
         }
         formatTime()
         setProgressBarNotification()
+
+        if (isDialogOpened.value) {
+            closeAlertDialog()
+        }
     }
 
     private fun formatTime() {
@@ -128,6 +132,20 @@ class PomofocusService : Service() {
             1f - (timer.value.toFloat() / totalTime.value)
         }
         setProgressBarNotification()
+    }
+
+    fun changePomofocusState() {
+        finishTimer()
+        updateSilentNotification()
+        removeFinishButton()
+    }
+
+    fun openAlertDialog() {
+        isDialogOpened.update { true }
+    }
+
+    fun closeAlertDialog() {
+        isDialogOpened.update { false }
     }
 
     @SuppressLint("ForegroundServiceType")
@@ -241,7 +259,9 @@ class PomofocusService : Service() {
     @SuppressLint("RestrictedApi")
     private fun setStartButton() {
         notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-        notificationBuilder.mActions.removeAt(0)
+        if (notificationBuilder.mActions.size > 0) {
+            notificationBuilder.mActions.removeAt(0)
+        }
         notificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
@@ -268,9 +288,11 @@ class PomofocusService : Service() {
 
     @SuppressLint("RestrictedApi")
     private fun removeFinishButton() {
-        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-        notificationBuilder.mActions.removeAt(1)
-        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
+        if (notificationBuilder.mActions.size > 1) {
+            notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
+            notificationBuilder.mActions.removeAt(1)
+            notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
+        }
     }
 
     private fun setFocusTimeTitle() {

@@ -25,6 +25,7 @@ fun PomodoroStateButton(
         containerColor = if (isCurrentState) BlackTransparent else Color.Transparent,
         contentColor = Color.White,
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+        enabled = !isCurrentState,
         content = {
             Text(
                 text = stringResource(id = stringRes),
@@ -43,6 +44,6 @@ private fun PomodoroStateButtonPreview() {
     PomodoroStateButton(
         onClick = {},
         isCurrentState = false,
-        stringRes = R.string.btn_short_break
+        stringRes = R.string.btn_short_break,
     )
 }

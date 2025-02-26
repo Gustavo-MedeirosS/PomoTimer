@@ -35,6 +35,7 @@ fun LandscapeLayout(
     currentColor: Color,
     innerPadding: PaddingValues,
     pomodoroState: PomofocusState,
+    onPomofocusButtonStateClick: () -> Unit,
     isTimerRunning: Boolean,
     totalTime: Int,
     timer: Int,
@@ -86,12 +87,12 @@ fun LandscapeLayout(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         PomodoroStateButton(
-                            onClick = {},
+                            onClick = onPomofocusButtonStateClick,
                             isCurrentState = pomodoroState == PomofocusState.FOCUS,
                             stringRes = R.string.btn_focus
                         )
                         PomodoroStateButton(
-                            onClick = {},
+                            onClick = onPomofocusButtonStateClick,
                             isCurrentState = pomodoroState == PomofocusState.SHORT_BREAK,
                             stringRes = R.string.btn_short_break
                         )
@@ -136,6 +137,7 @@ private fun LandscapeLayoutPreview() {
         currentColor = RedFocus,
         innerPadding = PaddingValues(),
         pomodoroState = PomofocusState.FOCUS,
+        onPomofocusButtonStateClick = {},
         isTimerRunning = true,
         totalTime = 25,
         timer = 5,
