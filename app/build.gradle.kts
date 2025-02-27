@@ -57,6 +57,13 @@ dependencies {
     // Window Size Class
     implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
 
+    // Splash Screen
+    implementation(libs.androidx.core.splashscreen)
+
+    // MockK
+//    testImplementation(libs.mockk)
+//    androidTestImplementation(libs.mockk.android)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

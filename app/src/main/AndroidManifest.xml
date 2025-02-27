@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PomoFocus"
+        android:theme="@style/Theme.PomofocusSplashScreen"
         tools:targetApi="31">
         <service
             android:name=".service.PomofocusService"
@@ -23,7 +23,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.PomoFocus">
+            android:theme="@style/Theme.PomofocusSplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
