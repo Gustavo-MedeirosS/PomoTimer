@@ -28,5 +28,11 @@ Kotlin - Jetpack Compose
 ## Screenshots
 #### App
 
+##### Portrait (Retrato)
+<img width="200px" src="app/screenshots/focus_timer.png" alt="Focus timer" /> <img width="200px" src="app/screenshots/focus_timer_running.png" alt="Focus timer running" /> <img width="200px" src="app/screenshots/focus_timer_paused.png" alt="Focus timer paused" /> <img width="200px" src="app/screenshots/dialog_change_to_break.png" alt="Dialog change to break time" /> <img width="200px" src="app/screenshots/break_timer.png" alt="Break timer" /> <img width="200px" src="app/screenshots/dialog_change_to_focus.png" alt="Dialog change to focus time" /> 
+
+##### Landscape (Paisagem)
+<img height="180px" src="app/screenshots/focus_timer_landscape.png" alt="Focus timer landscape" /> <img height="180px" src="app/screenshots/break_timer_landscape.png" alt="Break timer landscape" />
+
 #### Notification
-<img width="240px" src="app/screenshots/silent_notification_start_focus_timer.jpeg" alt="Start focus timer - Notification" /> <img width="240px" src="app/screenshots/silent_notification_timer_running.jpeg" alt="Timer running - Notification" /> <img width="240px" src="app/screenshots/silent_notification_timer_paused.jpeg" alt="Timer paused - Notification" /> <img width="240px" src="app/screenshots/alarm_notification_time_to_focus.jpeg" alt="Alarm Notification" />
+<img height="146px" src="app/screenshots/silent_notification_start_focus_timer.jpeg" alt="Start focus timer - Notification" /> <img height="146px" src="app/screenshots/silent_notification_timer_running.jpeg" alt="Timer running - Notification" /> <img height="146px" src="app/screenshots/silent_notification_timer_paused.jpeg" alt="Timer paused - Notification" /> <img height="146px" src="app/screenshots/alarm_notification_time_to_focus.jpeg" alt="Alarm Notification" />
