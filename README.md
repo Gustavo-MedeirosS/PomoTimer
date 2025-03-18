@@ -1,4 +1,4 @@
-# Pomofocus
+# PomoTimer
 Aplicativo Android de foco nas atividades
 
 
