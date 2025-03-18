@@ -1,4 +1,4 @@
-package com.example.pomofocus.ui.components
+package com.example.pomotimer.ui.components
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -8,14 +8,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.example.pomofocus.PomofocusState
-import com.example.pomofocus.R
+import com.example.pomotimer.PomotimerState
+import com.example.pomotimer.R
 
 @Composable
-fun BottomText(pomofocusState: PomofocusState) {
+fun BottomText(pomotimerState: PomotimerState) {
     Text(
         text =
-        if (pomofocusState == PomofocusState.FOCUS) stringResource(id = R.string.txt_focus)
+        if (pomotimerState == PomotimerState.FOCUS) stringResource(id = R.string.txt_focus)
         else stringResource(id = R.string.txt_break),
         style = TextStyle(
             color = Color.White,
@@ -28,5 +28,5 @@ fun BottomText(pomofocusState: PomofocusState) {
 @Preview
 @Composable
 private fun BottomTextPreview() {
-    BottomText(pomofocusState = PomofocusState.FOCUS)
+    BottomText(pomotimerState = PomotimerState.FOCUS)
 }

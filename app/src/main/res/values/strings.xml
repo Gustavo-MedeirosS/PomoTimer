@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PomoFocus</string>
+    <string name="app_name">PomoTimer</string>
 
     <string name="btn_focus">Focus</string>
     <string name="btn_short_break">Short break</string>

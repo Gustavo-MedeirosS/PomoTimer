@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pomofocus"
+    namespace = "com.example.pomotimer"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.pomofocus"
+        applicationId = "com.example.pomotimer"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -60,10 +60,13 @@ dependencies {
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)
 
-    // MockK
-//    testImplementation(libs.mockk)
-//    androidTestImplementation(libs.mockk.android)
-
+    // Test
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
+    // Optional -- UI testing with Espresso
+    androidTestImplementation(libs.androidx.espresso.core)
+    // Optional -- UI testing with Compose
+    androidTestImplementation(libs.ui.test.junit4)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

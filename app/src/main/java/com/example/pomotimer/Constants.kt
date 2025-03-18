@@ -1,9 +1,8 @@
-package com.example.pomofocus
+package com.example.pomotimer
 
 object Constants {
     const val FOCUS_TIMER = 25 * 60
     const val SHORT_BREAK_TIMER = 5 * 60
-    const val LONG_BREAK_TIMER = 15 * 60
 
     const val SILENT_NOTIFICATION_CHANNEL_ID = "SILENT_NOTIFICATION_CHANNEL_ID"
     const val ALARM_NOTIFICATION_CHANNEL_ID = "ALARM_NOTIFICATION_CHANNEL_ID"

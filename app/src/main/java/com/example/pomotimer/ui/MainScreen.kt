@@ -1,4 +1,4 @@
-package com.example.pomofocus.ui
+package com.example.pomotimer.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,37 +12,37 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.pomofocus.Constants
-import com.example.pomofocus.PomofocusState
-import com.example.pomofocus.service.PomofocusService
-import com.example.pomofocus.service.ServiceHelper
-import com.example.pomofocus.ui.components.AlertDialog
-import com.example.pomofocus.ui.layout.LandscapeLayout
-import com.example.pomofocus.ui.layout.PortraitLayout
-import com.example.pomofocus.ui.theme.GreenShortBreak
-import com.example.pomofocus.ui.theme.RedFocus
+import com.example.pomotimer.Constants
+import com.example.pomotimer.PomotimerState
+import com.example.pomotimer.service.PomotimerService
+import com.example.pomotimer.service.ServiceHelper
+import com.example.pomotimer.ui.components.AlertDialog
+import com.example.pomotimer.ui.layout.LandscapeLayout
+import com.example.pomotimer.ui.layout.PortraitLayout
+import com.example.pomotimer.ui.theme.GreenShortBreak
+import com.example.pomotimer.ui.theme.RedFocus
 import kotlinx.coroutines.delay
 
 @SuppressLint("DefaultLocale")
 @Composable
 fun MainScreen(
-    pomofocusService: PomofocusService,
+    pomotimerService: PomotimerService,
     windowSizeClass: WindowSizeClass
 ) {
     val context = LocalContext.current
-    val totalTime by pomofocusService.totalTime.collectAsState()
-    val timer by pomofocusService.timer.collectAsState()
-    val isTimerRunning by pomofocusService.isTimerRunning.collectAsState()
-    val minutes by pomofocusService.minutes.collectAsState()
-    val seconds by pomofocusService.seconds.collectAsState()
-    val progressTimerIndicator by pomofocusService.progressTimerIndicator.collectAsState()
-    val pomodoroState by pomofocusService.pomofocusState.collectAsState()
-    val isDialogOpened by pomofocusService.isDialogOpened.collectAsState()
+    val totalTime by pomotimerService.totalTime.collectAsState()
+    val timer by pomotimerService.timer.collectAsState()
+    val isTimerRunning by pomotimerService.isTimerRunning.collectAsState()
+    val minutes by pomotimerService.minutes.collectAsState()
+    val seconds by pomotimerService.seconds.collectAsState()
+    val progressTimerIndicator by pomotimerService.progressTimerIndicator.collectAsState()
+    val pomodoroState by pomotimerService.pomotimerState.collectAsState()
+    val isDialogOpened by pomotimerService.isDialogOpened.collectAsState()
 
     LaunchedEffect(key1 = timer, key2 = isTimerRunning) {
         if (timer > 0 && isTimerRunning) {
             delay(1000L)
-            pomofocusService.decreaseTimer()
+            pomotimerService.decreaseTimer()
         } else if (timer == 0) {
             ServiceHelper.triggerForegroundService(
                 context = context,
@@ -54,13 +54,13 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        val currentColor = if (pomodoroState == PomofocusState.FOCUS) RedFocus else GreenShortBreak
+        val currentColor = if (pomodoroState == PomotimerState.FOCUS) RedFocus else GreenShortBreak
 
         if (isDialogOpened) {
             AlertDialog(
-                onDismissRequest = { pomofocusService.closeAlertDialog() },
-                onConfirmClick = { pomofocusService.changePomofocusState() },
-                pomofocusState = pomodoroState
+                onDismissRequest = { pomotimerService.closeAlertDialog() },
+                onConfirmClick = { pomotimerService.changePomotimerState() },
+                pomotimerState = pomodoroState
             )
         }
 
@@ -73,9 +73,9 @@ fun MainScreen(
                     pomodoroState = pomodoroState,
                     onPomofocusButtonStateClick = {
                         if (isTimerRunning) {
-                            pomofocusService.openAlertDialog()
+                            pomotimerService.openAlertDialog()
                         } else {
-                            pomofocusService.changePomofocusState()
+                            pomotimerService.changePomotimerState()
                         }
                     },
                     isTimerRunning = isTimerRunning,
@@ -95,9 +95,9 @@ fun MainScreen(
                     pomodoroState = pomodoroState,
                     onPomofocusButtonStateClick = {
                         if (isTimerRunning) {
-                            pomofocusService.openAlertDialog()
+                            pomotimerService.openAlertDialog()
                         } else {
-                            pomofocusService.changePomofocusState()
+                            pomotimerService.changePomotimerState()
                         }
                     },
                     isTimerRunning = isTimerRunning,

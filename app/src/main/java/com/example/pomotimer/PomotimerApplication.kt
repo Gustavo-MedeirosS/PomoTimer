@@ -1,7 +1,7 @@
-package com.example.pomofocus
+package com.example.pomotimer
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class PomofocusApplication : Application()
+class PomotimerApplication : Application()

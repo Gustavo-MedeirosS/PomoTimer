@@ -1,4 +1,4 @@
-package com.example.pomofocus.ui.theme
+package com.example.pomotimer.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

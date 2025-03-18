@@ -1,4 +1,4 @@
-package com.example.pomofocus.service
+package com.example.pomotimer.service
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -9,34 +9,34 @@ import android.media.RingtoneManager
 import android.os.Binder
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.example.pomofocus.Constants.ACTION_SERVICE_FINISH
-import com.example.pomofocus.Constants.ACTION_SERVICE_PAUSE
-import com.example.pomofocus.Constants.ACTION_SERVICE_RESUME
-import com.example.pomofocus.Constants.ACTION_SERVICE_START
-import com.example.pomofocus.Constants.ALARM_NOTIFICATION_CHANNEL_ID
-import com.example.pomofocus.Constants.ALARM_NOTIFICATION_ID
-import com.example.pomofocus.Constants.FOCUS_TIMER
-import com.example.pomofocus.Constants.NOTIFICATION_TIMER_FINISHED_NAME
-import com.example.pomofocus.Constants.NOTIFICATION_TIMER_UPDATES_NAME
-import com.example.pomofocus.Constants.SHORT_BREAK_TIMER
-import com.example.pomofocus.Constants.SILENT_NOTIFICATION_CHANNEL_ID
-import com.example.pomofocus.Constants.SILENT_NOTIFICATION_ID
-import com.example.pomofocus.PomofocusState
-import com.example.pomofocus.R
+import com.example.pomotimer.Constants.ACTION_SERVICE_FINISH
+import com.example.pomotimer.Constants.ACTION_SERVICE_PAUSE
+import com.example.pomotimer.Constants.ACTION_SERVICE_RESUME
+import com.example.pomotimer.Constants.ACTION_SERVICE_START
+import com.example.pomotimer.Constants.ALARM_NOTIFICATION_CHANNEL_ID
+import com.example.pomotimer.Constants.ALARM_NOTIFICATION_ID
+import com.example.pomotimer.Constants.FOCUS_TIMER
+import com.example.pomotimer.Constants.NOTIFICATION_TIMER_FINISHED_NAME
+import com.example.pomotimer.Constants.NOTIFICATION_TIMER_UPDATES_NAME
+import com.example.pomotimer.Constants.SHORT_BREAK_TIMER
+import com.example.pomotimer.Constants.SILENT_NOTIFICATION_CHANNEL_ID
+import com.example.pomotimer.Constants.SILENT_NOTIFICATION_ID
+import com.example.pomotimer.PomotimerState
+import com.example.pomotimer.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PomofocusService : Service() {
+class PomotimerService : Service() {
     @Inject
     lateinit var notificationManager: NotificationManager
 
     @Inject
     lateinit var notificationBuilder: NotificationCompat.Builder
 
-    private val binder = PomofocusBinder()
+    private val binder = PomotimerBinder()
 
     val totalTime = MutableStateFlow(FOCUS_TIMER)
     val timer = MutableStateFlow(totalTime.value)
@@ -48,7 +48,7 @@ class PomofocusService : Service() {
 
     val progressTimerIndicator = MutableStateFlow(0f)
 
-    val pomofocusState = MutableStateFlow(PomofocusState.FOCUS)
+    val pomotimerState = MutableStateFlow(PomotimerState.FOCUS)
 
     override fun onBind(intent: Intent?) = binder
 
@@ -59,7 +59,7 @@ class PomofocusService : Service() {
                 ACTION_SERVICE_START -> {
                     startResumeTimer()
                     startForegroundService()
-                    if (pomofocusState.value == PomofocusState.FOCUS) setFocusTimeTitle() else setBreakTimeTitle()
+                    if (pomotimerState.value == PomotimerState.FOCUS) setFocusTimeTitle() else setBreakTimeTitle()
                     setPauseButton()
                     setFinishButton()
                 }
@@ -105,15 +105,15 @@ class PomofocusService : Service() {
     private fun finishTimer() {
         pauseTimer()
         progressTimerIndicator.update { 0f }
-        if (pomofocusState.value == PomofocusState.FOCUS) {
+        if (pomotimerState.value == PomotimerState.FOCUS) {
             totalTime.update { SHORT_BREAK_TIMER }
             timer.update { SHORT_BREAK_TIMER }
-            pomofocusState.update { PomofocusState.SHORT_BREAK }
+            pomotimerState.update { PomotimerState.SHORT_BREAK }
             setBreakTimeTitle()
         } else {
             totalTime.update { FOCUS_TIMER }
             timer.update { FOCUS_TIMER }
-            pomofocusState.update { PomofocusState.FOCUS }
+            pomotimerState.update { PomotimerState.FOCUS }
             setFocusTimeTitle()
         }
         formatTime()
@@ -136,7 +136,7 @@ class PomofocusService : Service() {
         setProgressBarNotification()
     }
 
-    fun changePomofocusState() {
+    fun changePomotimerState() {
         finishTimer()
         updateSilentNotification()
         removeFinishButton()
@@ -209,11 +209,11 @@ class PomofocusService : Service() {
             notificationBuilder
                 .setChannelId(ALARM_NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(
-                    if (pomofocusState.value == PomofocusState.FOCUS) applicationContext.getString(R.string.ntf_alarm_title_focus)
+                    if (pomotimerState.value == PomotimerState.FOCUS) applicationContext.getString(R.string.ntf_alarm_title_focus)
                     else applicationContext.getString(R.string.ntf_alarm_title_break)
                 )
                 .setContentText(
-                    if (pomofocusState.value == PomofocusState.FOCUS) applicationContext.getString(R.string.ntf_msg_focus)
+                    if (pomotimerState.value == PomotimerState.FOCUS) applicationContext.getString(R.string.ntf_msg_focus)
                     else applicationContext.getString(R.string.ntf_msg_break)
                 )
                 .setOngoing(false)
@@ -334,7 +334,7 @@ class PomofocusService : Service() {
         )
     }
 
-    inner class PomofocusBinder : Binder() {
-        fun getService(): PomofocusService = this@PomofocusService
+    inner class PomotimerBinder : Binder() {
+        fun getService(): PomotimerService = this@PomotimerService
     }
 }

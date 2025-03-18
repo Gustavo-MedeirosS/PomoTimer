@@ -1,4 +1,4 @@
-package com.example.pomofocus.ui.layout
+package com.example.pomotimer.ui.layout
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -18,23 +18,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.pomofocus.Constants
-import com.example.pomofocus.PomofocusState
-import com.example.pomofocus.R
-import com.example.pomofocus.service.ServiceHelper
-import com.example.pomofocus.ui.components.BottomText
-import com.example.pomofocus.ui.components.ChronometerBox
-import com.example.pomofocus.ui.components.ChronometerButtons
-import com.example.pomofocus.ui.components.HeaderText
-import com.example.pomofocus.ui.components.PomodoroStateButton
-import com.example.pomofocus.ui.theme.RedFocus
+import com.example.pomotimer.Constants
+import com.example.pomotimer.PomotimerState
+import com.example.pomotimer.R
+import com.example.pomotimer.service.ServiceHelper
+import com.example.pomotimer.ui.components.BottomText
+import com.example.pomotimer.ui.components.ChronometerBox
+import com.example.pomotimer.ui.components.ChronometerButtons
+import com.example.pomotimer.ui.components.HeaderText
+import com.example.pomotimer.ui.components.PomodoroStateButton
+import com.example.pomotimer.ui.theme.RedFocus
 
 @Composable
 fun LandscapeLayout(
     context: Context,
     currentColor: Color,
     innerPadding: PaddingValues,
-    pomodoroState: PomofocusState,
+    pomodoroState: PomotimerState,
     onPomofocusButtonStateClick: () -> Unit,
     isTimerRunning: Boolean,
     totalTime: Int,
@@ -88,12 +88,12 @@ fun LandscapeLayout(
                     ) {
                         PomodoroStateButton(
                             onClick = onPomofocusButtonStateClick,
-                            isCurrentState = pomodoroState == PomofocusState.FOCUS,
+                            isCurrentState = pomodoroState == PomotimerState.FOCUS,
                             stringRes = R.string.btn_focus
                         )
                         PomodoroStateButton(
                             onClick = onPomofocusButtonStateClick,
-                            isCurrentState = pomodoroState == PomofocusState.SHORT_BREAK,
+                            isCurrentState = pomodoroState == PomotimerState.SHORT_BREAK,
                             stringRes = R.string.btn_short_break
                         )
                     }
@@ -122,7 +122,7 @@ fun LandscapeLayout(
                             )
                         }
                     )
-                    BottomText(pomofocusState = pomodoroState)
+                    BottomText(pomotimerState = pomodoroState)
                 }
             }
         }
@@ -136,7 +136,7 @@ private fun LandscapeLayoutPreview() {
         context = LocalContext.current,
         currentColor = RedFocus,
         innerPadding = PaddingValues(),
-        pomodoroState = PomofocusState.FOCUS,
+        pomodoroState = PomotimerState.FOCUS,
         onPomofocusButtonStateClick = {},
         isTimerRunning = true,
         totalTime = 25,

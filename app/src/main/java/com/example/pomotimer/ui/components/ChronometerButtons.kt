@@ -1,4 +1,4 @@
-package com.example.pomofocus.ui.components
+package com.example.pomotimer.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.pomofocus.R
-import com.example.pomofocus.ui.theme.RedFocus
+import com.example.pomotimer.R
+import com.example.pomotimer.ui.theme.RedFocus
 
 @Composable
 fun ChronometerButtons(

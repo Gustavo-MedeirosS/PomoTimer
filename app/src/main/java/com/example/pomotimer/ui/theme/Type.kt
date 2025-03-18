@@ -1,4 +1,4 @@
-package com.example.pomofocus.ui.theme
+package com.example.pomotimer.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

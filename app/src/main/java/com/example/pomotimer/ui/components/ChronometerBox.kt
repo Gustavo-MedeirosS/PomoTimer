@@ -1,4 +1,4 @@
-package com.example.pomofocus.ui.components
+package com.example.pomotimer.ui.components
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
@@ -25,8 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.pomofocus.ui.theme.BlackTransparent
-import com.example.pomofocus.ui.theme.WhiteTransparent
+import com.example.pomotimer.ui.theme.BlackTransparent
+import com.example.pomotimer.ui.theme.WhiteTransparent
 
 @SuppressLint("DefaultLocale")
 @Composable

@@ -1,4 +1,4 @@
-package com.example.pomofocus.ui.components
+package com.example.pomotimer.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,16 +24,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.pomofocus.PomofocusState
-import com.example.pomofocus.R
-import com.example.pomofocus.ui.theme.GreenShortBreak
-import com.example.pomofocus.ui.theme.RedFocus
+import com.example.pomotimer.PomotimerState
+import com.example.pomotimer.R
+import com.example.pomotimer.ui.theme.GreenShortBreak
+import com.example.pomotimer.ui.theme.RedFocus
 
 @Composable
 fun AlertDialog(
     onDismissRequest: () -> Unit,
     onConfirmClick: () -> Unit,
-    pomofocusState: PomofocusState
+    pomotimerState: PomotimerState
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -72,7 +72,7 @@ fun AlertDialog(
                     Text(
                         text = stringResource(id = R.string.btn_confirm),
                         fontSize = 20.sp,
-                        color = if (pomofocusState == PomofocusState.FOCUS) RedFocus else GreenShortBreak
+                        color = if (pomotimerState == PomotimerState.FOCUS) RedFocus else GreenShortBreak
                     )
                 }
             }
@@ -84,6 +84,6 @@ fun AlertDialog(
 @Composable
 private fun AlertDialogPreview() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        AlertDialog({}, {}, PomofocusState.FOCUS)
+        AlertDialog({}, {}, PomotimerState.FOCUS)
     }
 }

@@ -1,11 +1,11 @@
-package com.example.pomofocus.di
+package com.example.pomotimer.di
 
 import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
-import com.example.pomofocus.Constants
-import com.example.pomofocus.R
-import com.example.pomofocus.service.ServiceHelper
+import com.example.pomotimer.Constants
+import com.example.pomotimer.R
+import com.example.pomotimer.service.ServiceHelper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,11 +24,8 @@ object NotificationModule {
     ): NotificationCompat.Builder {
         val builder = NotificationCompat.Builder(context, Constants.SILENT_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.timer_icon)
-//            .setContentTitle("Focus time")
             .setContentText("00:00")
             .setShowWhen(false)
-//            .setOngoing(true)
-//            .addAction(0, "Start", ServiceHelper.startPendingIntent(context = context))
             .setContentIntent(ServiceHelper.clickPendingIntent(context = context))
 
         return builder

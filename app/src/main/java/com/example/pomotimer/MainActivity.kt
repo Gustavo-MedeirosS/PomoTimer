@@ -1,4 +1,4 @@
-package com.example.pomofocus
+package com.example.pomotimer
 
 import android.Manifest
 import android.content.ComponentName
@@ -19,19 +19,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.example.pomofocus.service.PomofocusService
-import com.example.pomofocus.ui.MainScreen
+import com.example.pomotimer.service.PomotimerService
+import com.example.pomotimer.ui.MainScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private var isBound by mutableStateOf(false)
-    private lateinit var pomofocusService: PomofocusService
+    private lateinit var pomotimerService: PomotimerService
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as PomofocusService.PomofocusBinder
-            pomofocusService = binder.getService()
+            val binder = service as PomotimerService.PomotimerBinder
+            pomotimerService = binder.getService()
             isBound = true
         }
 
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
             if (isBound) {
                 val windowSizeClass = calculateWindowSizeClass(this)
                 MainScreen(
-                    pomofocusService = pomofocusService,
+                    pomotimerService = pomotimerService,
                     windowSizeClass = windowSizeClass
                 )
             }
@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Intent(this, PomofocusService::class.java).also { intent ->
+        Intent(this, PomotimerService::class.java).also { intent ->
             bindService(intent, connection, BIND_AUTO_CREATE)
         }
     }
