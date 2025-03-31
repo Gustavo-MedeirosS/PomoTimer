@@ -9,6 +9,7 @@ import android.media.RingtoneManager
 import android.os.Binder
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.example.pomotimer.Constants.ACTION_SERVICE_CANCEL_NOTIFICATIONS
 import com.example.pomotimer.Constants.ACTION_SERVICE_FINISH
 import com.example.pomotimer.Constants.ACTION_SERVICE_PAUSE
 import com.example.pomotimer.Constants.ACTION_SERVICE_RESUME
@@ -37,6 +38,8 @@ class PomotimerService : Service() {
     lateinit var notificationBuilder: NotificationCompat.Builder
 
     private val binder = PomotimerBinder()
+
+    private var isForegroundServiceRunning = false
 
     val totalTime = MutableStateFlow(FOCUS_TIMER)
     val timer = MutableStateFlow(totalTime.value)
@@ -80,6 +83,11 @@ class PomotimerService : Service() {
                     removeFinishButton()
                     updateSilentNotification()
                     updateAlarmNotification()
+                }
+
+                ACTION_SERVICE_CANCEL_NOTIFICATIONS -> {
+                    stopForegroundService()
+                    cancelNotifications()
                 }
             }
         }
@@ -137,6 +145,9 @@ class PomotimerService : Service() {
     }
 
     fun changePomotimerState() {
+        if (!isForegroundServiceRunning) {
+            startForegroundService()
+        }
         finishTimer()
         updateSilentNotification()
         removeFinishButton()
@@ -154,12 +165,14 @@ class PomotimerService : Service() {
     private fun startForegroundService() {
         createNotificationChannels()
         startForeground(SILENT_NOTIFICATION_ID, notificationBuilder.build())
+        isForegroundServiceRunning = true
     }
 
     private fun stopForegroundService() {
-        notificationManager.cancel(SILENT_NOTIFICATION_ID)
+        notificationManager.cancelAll()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
+        isForegroundServiceRunning = false
     }
 
     private fun createNotificationChannels() {
@@ -321,6 +334,10 @@ class PomotimerService : Service() {
                 applicationContext.getString(R.string.ntf_silent_title_break)
             ).build()
         )
+    }
+
+    private fun cancelNotifications() {
+        notificationManager.cancelAll()
     }
 
     private fun setProgressBarNotification() {

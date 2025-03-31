@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.pomotimer.service.PomotimerService
+import com.example.pomotimer.service.ServiceHelper
 import com.example.pomotimer.ui.MainScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -77,8 +78,12 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         unbindService(connection)
         isBound = false
+        ServiceHelper.triggerForegroundService(
+            context = this@MainActivity,
+            action = Constants.ACTION_SERVICE_CANCEL_NOTIFICATIONS
+        )
+        super.onDestroy()
     }
 }
