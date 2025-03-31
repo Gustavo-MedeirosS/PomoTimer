@@ -161,7 +161,6 @@ class PomotimerService : Service() {
         isDialogOpened.update { false }
     }
 
-    @SuppressLint("ForegroundServiceType")
     private fun startForegroundService() {
         createNotificationChannels()
         startForeground(SILENT_NOTIFICATION_ID, notificationBuilder.build())
