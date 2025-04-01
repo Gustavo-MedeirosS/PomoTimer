@@ -5,7 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -191,7 +191,10 @@ class PomotimerService : Service() {
             ).apply {
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 500, 500, 500)
-                setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM), null)
+                val soundUri = Uri.parse(
+                    "android.resource://com.example.pomotimer/" + R.raw.classic_alarm_clock_sound
+                )
+                setSound(soundUri, null)
             }
 
             notificationManager.createNotificationChannels(listOf(silentChannel, alertChannel))
