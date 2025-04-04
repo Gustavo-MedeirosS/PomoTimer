@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PomoFocus</string>
+    <string name="app_name">PomoTimer</string>
+
     <string name="btn_focus">Foco</string>
     <string name="btn_short_break">Breve pausa</string>
     <string name="btn_long_break">Longa pausa</string>

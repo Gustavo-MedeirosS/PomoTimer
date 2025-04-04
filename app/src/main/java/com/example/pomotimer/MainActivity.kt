@@ -19,25 +19,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.ViewModelProvider
 import com.example.pomotimer.service.PomotimerService
-import com.example.pomotimer.service.ServiceHelper
-import com.example.pomotimer.ui.MainScreen
+import com.example.pomotimer.ui.screen.MainScreen
+import com.example.pomotimer.ui.view_model.PomotimerViewModel
+import com.example.pomotimer.ui.view_model.ViewModelProviderHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private var isBound by mutableStateOf(false)
-    private lateinit var pomotimerService: PomotimerService
+    private var pomotimerService: PomotimerService? = null
+    private lateinit var pomotimerViewModel: PomotimerViewModel
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as PomotimerService.PomotimerBinder
             pomotimerService = binder.getService()
+            pomotimerViewModel.setService(service = pomotimerService!!)
             isBound = true
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             isBound = false
+            pomotimerViewModel.setService(service = null)
         }
     }
 
@@ -47,15 +52,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         installSplashScreen()
+
+        pomotimerViewModel = ViewModelProvider(this)[PomotimerViewModel::class.java]
+        ViewModelProviderHelper.viewModel = pomotimerViewModel
+
         setContent {
             if (isBound) {
                 val windowSizeClass = calculateWindowSizeClass(this)
                 MainScreen(
-                    pomotimerService = pomotimerService,
                     windowSizeClass = windowSizeClass
                 )
             }
         }
+
         requestPermissions(Manifest.permission.POST_NOTIFICATIONS)
     }
 
@@ -80,10 +89,11 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         unbindService(connection)
         isBound = false
-        ServiceHelper.triggerForegroundService(
+        pomotimerViewModel.triggerForegroundService(
             context = this@MainActivity,
             action = Constants.ACTION_SERVICE_CANCEL_NOTIFICATIONS
         )
+        ViewModelProviderHelper.viewModel = null
         super.onDestroy()
     }
 }

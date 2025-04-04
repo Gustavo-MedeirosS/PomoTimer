@@ -15,10 +15,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pomotimer.Constants
-import com.example.pomotimer.PomotimerState
+import com.example.pomotimer.ui.PomotimerState
+import com.example.pomotimer.ui.view_model.PomotimerViewModel
 import com.example.pomotimer.R
-import com.example.pomotimer.service.ServiceHelper
 import com.example.pomotimer.ui.components.BottomText
 import com.example.pomotimer.ui.components.ChronometerBox
 import com.example.pomotimer.ui.components.ChronometerButtons
@@ -29,6 +30,7 @@ import com.example.pomotimer.ui.theme.RedFocus
 @Composable
 fun PortraitLayout(
     context: Context,
+    pomotimerViewModel: PomotimerViewModel,
     currentColor: Color,
     innerPadding: PaddingValues,
     pomodoroState: PomotimerState,
@@ -70,7 +72,6 @@ fun PortraitLayout(
                     isCurrentState = pomodoroState == PomotimerState.SHORT_BREAK,
                     stringRes = R.string.btn_short_break
                 )
-
             }
 
             ChronometerBox(
@@ -86,19 +87,19 @@ fun PortraitLayout(
                 totalTime = totalTime,
                 onMainButtonClick = {
                     if (isTimerRunning) {
-                        ServiceHelper.triggerForegroundService(
+                        pomotimerViewModel.triggerForegroundService(
                             context = context,
                             action = Constants.ACTION_SERVICE_PAUSE
                         )
                     } else {
-                        ServiceHelper.triggerForegroundService(
+                        pomotimerViewModel.triggerForegroundService(
                             context = context,
                             action = Constants.ACTION_SERVICE_START
                         )
                     }
                 },
                 onPlayerNextClick = {
-                    ServiceHelper.triggerForegroundService(
+                    pomotimerViewModel.triggerForegroundService(
                         context = context,
                         action = Constants.ACTION_SERVICE_FINISH
                     )
@@ -115,6 +116,7 @@ fun PortraitLayout(
 private fun PortraitLayoutPreview() {
     PortraitLayout(
         context = LocalContext.current,
+        pomotimerViewModel = hiltViewModel(),
         currentColor = RedFocus,
         innerPadding = PaddingValues(),
         pomodoroState = PomotimerState.FOCUS,

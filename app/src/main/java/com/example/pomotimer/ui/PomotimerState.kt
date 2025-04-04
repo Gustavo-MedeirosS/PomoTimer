@@ -1,4 +1,4 @@
-package com.example.pomotimer
+package com.example.pomotimer.ui
 
 enum class PomotimerState {
     FOCUS,

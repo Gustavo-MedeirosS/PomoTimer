@@ -1,5 +1,7 @@
 package com.example.pomotimer
 
+import android.app.PendingIntent
+
 object Constants {
     const val FOCUS_TIMER = 25 * 60
     const val SHORT_BREAK_TIMER = 5 * 60
@@ -21,4 +23,6 @@ object Constants {
     const val FINISH_REQUEST_CODE = 101
     const val PAUSE_REQUEST_CODE = 102
     const val START_RESUME_REQUEST_CODE = 103
+
+    const val FLAG = PendingIntent.FLAG_IMMUTABLE
 }
