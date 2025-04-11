@@ -62,7 +62,7 @@ fun ChronometerButtons(
             )
         }
 
-        if (timer != totalTime) {
+        if (timer != totalTime || isTimerRunning) {
             Box(
                 modifier = Modifier.fillMaxWidth(0.9f),
                 contentAlignment = Alignment.CenterEnd
