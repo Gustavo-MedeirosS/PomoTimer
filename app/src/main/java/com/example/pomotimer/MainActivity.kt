@@ -71,11 +71,7 @@ class MainActivity : ComponentActivity() {
     private fun requestPermissions(vararg permissions: String) {
         val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
-        ) { result ->
-            result.entries.forEach {
-                Log.d("MainActivity", "${it.key} = ${it.value}")
-            }
-        }
+        ) {}
         requestPermissionLauncher.launch(permissions.asList().toTypedArray())
     }
 
