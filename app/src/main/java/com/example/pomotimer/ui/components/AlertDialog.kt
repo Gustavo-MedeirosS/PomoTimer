@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.pomotimer.ui.PomotimerState
-import com.example.pomotimer.R
+import medeiros.dev.pomotimer.R
 import com.example.pomotimer.ui.theme.GreenShortBreak
 import com.example.pomotimer.ui.theme.RedFocus
 

@@ -9,7 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.pomotimer.ui.PomotimerState
-import com.example.pomotimer.R
+import medeiros.dev.pomotimer.R
 
 @Composable
 fun BottomText(pomotimerState: PomotimerState) {

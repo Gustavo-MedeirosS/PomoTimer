@@ -19,7 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.pomotimer.Constants
 import com.example.pomotimer.ui.PomotimerState
 import com.example.pomotimer.ui.view_model.PomotimerViewModel
-import com.example.pomotimer.R
+import medeiros.dev.pomotimer.R
 import com.example.pomotimer.ui.components.BottomText
 import com.example.pomotimer.ui.components.ChronometerBox
 import com.example.pomotimer.ui.components.ChronometerButtons

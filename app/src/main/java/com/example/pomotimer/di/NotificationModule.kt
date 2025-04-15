@@ -4,7 +4,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import com.example.pomotimer.Constants
-import com.example.pomotimer.R
+import medeiros.dev.pomotimer.R
 import com.example.pomotimer.service.ServiceHelper
 import dagger.Module
 import dagger.Provides

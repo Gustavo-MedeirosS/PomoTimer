@@ -21,7 +21,7 @@ import com.example.pomotimer.Constants.NOTIFICATION_TIMER_UPDATES_NAME
 import com.example.pomotimer.Constants.SILENT_NOTIFICATION_CHANNEL_ID
 import com.example.pomotimer.Constants.SILENT_NOTIFICATION_ID
 import com.example.pomotimer.ui.PomotimerState
-import com.example.pomotimer.R
+import medeiros.dev.pomotimer.R
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

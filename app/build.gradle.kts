@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pomotimer"
+    namespace = "medeiros.dev.pomotimer"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.pomotimer"
+        applicationId = "medeiros.dev.pomotimer"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
