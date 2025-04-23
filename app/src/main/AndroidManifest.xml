@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
-        android:name=".PomotimerApplication"
+        android:name="com.example.pomotimer.PomotimerApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -19,17 +19,17 @@
         tools:targetApi="31">
 
         <receiver
-            android:name=".PomotimerReceiver"
+            android:name="com.example.pomotimer.PomotimerReceiver"
             android:exported="false" />
 
         <service
-            android:name=".service.PomotimerService"
+            android:name="com.example.pomotimer.service.PomotimerService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.pomotimer.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.PomotimerSplashScreen">
             <intent-filter>
