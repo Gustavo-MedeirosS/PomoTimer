@@ -50,11 +50,16 @@ class PomotimerService : Service() {
                     setFinishButton()
                 }
 
-                ACTION_SERVICE_PAUSE -> { setResumeButton() }
+                ACTION_SERVICE_PAUSE -> {
+                    setResumeButton()
+                }
 
-                ACTION_SERVICE_RESUME -> { setPauseButton() }
+                ACTION_SERVICE_RESUME -> {
+                    setPauseButton()
+                    setFinishButton()
+                }
 
-                ACTION_SERVICE_FINISH -> {  }
+                ACTION_SERVICE_FINISH -> {}
 
                 ACTION_SERVICE_CANCEL_NOTIFICATIONS -> {
                     stopForegroundService()
@@ -113,9 +118,21 @@ class PomotimerService : Service() {
         }
     }
 
-    fun updateSilentNotification(totalTime: Int, timer: Int, minutes: Int, seconds: Int) {
+    fun updateSilentNotification(
+        pomotimerState: PomotimerState,
+        isTimerRunning: Boolean,
+        totalTime: Int,
+        timer: Int,
+        minutes: Int,
+        seconds: Int
+    ) {
         if (totalTime == timer) {
             setStartButton()
+        }
+        if (pomotimerState == PomotimerState.FOCUS) setFocusTimeTitle() else setBreakTimeTitle()
+        if (isTimerRunning) {
+            setPauseButton()
+            setFinishButton()
         }
         notificationManager.notify(
             SILENT_NOTIFICATION_ID,
@@ -160,7 +177,9 @@ class PomotimerService : Service() {
     @SuppressLint("RestrictedApi")
     private fun setResumeButton() {
         notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-        notificationBuilder.mActions.removeAt(0)
+        if (notificationBuilder.mActions.size > 0) {
+            notificationBuilder.mActions.removeAt(0)
+        }
         notificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
@@ -209,8 +228,7 @@ class PomotimerService : Service() {
     @SuppressLint("RestrictedApi")
     private fun setFinishButton() {
         notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-        val actionsListSize = notificationBuilder.mActions.size
-        if (actionsListSize == 1) {
+        if (notificationBuilder.mActions.size == 1) {
             notificationBuilder.mActions.add(
                 1,
                 NotificationCompat.Action(

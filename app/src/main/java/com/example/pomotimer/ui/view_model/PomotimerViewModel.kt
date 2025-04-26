@@ -59,6 +59,8 @@ class PomotimerViewModel @Inject constructor() : ViewModel() {
                 ACTION_SERVICE_FINISH -> {
                     finishTimer()
                     pomotimerService!!.updateSilentNotification(
+                        pomotimerState = pomotimerState.value,
+                        isTimerRunning = isTimerRunning.value,
                         totalTime = totalTime.value,
                         timer = timer.value,
                         minutes = minutes.value,
@@ -121,6 +123,8 @@ class PomotimerViewModel @Inject constructor() : ViewModel() {
         calculateProgressTimerIndicator()
         if (pomotimerService != null) {
             pomotimerService!!.updateSilentNotification(
+                pomotimerState = pomotimerState.value,
+                isTimerRunning = isTimerRunning.value,
                 totalTime = totalTime.value,
                 timer = timer.value,
                 minutes = minutes.value,
@@ -158,6 +162,8 @@ class PomotimerViewModel @Inject constructor() : ViewModel() {
         finishTimer()
         if (pomotimerService != null) {
             pomotimerService!!.updateSilentNotification(
+                pomotimerState = pomotimerState.value,
+                isTimerRunning = isTimerRunning.value,
                 totalTime = totalTime.value,
                 timer = timer.value,
                 minutes = minutes.value,
