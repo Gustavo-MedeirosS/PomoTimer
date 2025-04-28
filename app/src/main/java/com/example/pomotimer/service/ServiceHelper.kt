@@ -19,7 +19,9 @@ object ServiceHelper {
 
     // click intent
     fun clickPendingIntent(context: Context): PendingIntent {
-        val clickIntent = Intent(context, MainActivity::class.java)
+        val clickIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
         return PendingIntent.getActivity(
             context, CLICK_REQUEST_CODE, clickIntent, FLAG
         )
