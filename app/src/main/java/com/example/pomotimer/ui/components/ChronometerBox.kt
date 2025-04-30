@@ -47,14 +47,35 @@ fun ChronometerBox(
             .background(WhiteTransparent),
         contentAlignment = Alignment.Center
     ) {
+        val minutesToString = String.format("%02d", minutes)
+        val tenMinutes = minutesToString[0]
+        val unityMinutes = minutesToString[1]
+        val secondsToString = String.format("%02d", seconds)
+        val tenSeconds  = secondsToString[0]
+        val unitySeconds = secondsToString[1]
+
         Row {
             AnimatedContent(
-                targetState = minutes,
-                label = "Decreasing minutes animation",
+                targetState = tenMinutes,
+                label = "Decreasing ten minutes animation",
                 transitionSpec = { slideInVertically { -it } togetherWith slideOutVertically { it } }
-            ) { minutes ->
+            ) { tenMinutes ->
                 Text(
-                    text = String.format("%02d", minutes),
+                    text = tenMinutes.toString(),
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 60.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                )
+            }
+            AnimatedContent(
+                targetState = unityMinutes,
+                label = "Decreasing unity minutes animation",
+                transitionSpec = { slideInVertically { -it } togetherWith slideOutVertically { it } }
+            ) { unityMinutes ->
+                Text(
+                    text = unityMinutes.toString(),
                     style = TextStyle(
                         color = Color.White,
                         fontSize = 60.sp,
@@ -71,12 +92,26 @@ fun ChronometerBox(
                 )
             )
             AnimatedContent(
-                targetState = seconds,
-                label = "Decreasing seconds animation",
+                targetState = tenSeconds ,
+                label = "Decreasing ten seconds animation",
                 transitionSpec = { slideInVertically { -it } togetherWith slideOutVertically { it } }
-            ) { seconds ->
+            ) { tenSeconds  ->
                 Text(
-                    text = String.format("%02d", seconds),
+                    text = tenSeconds .toString(),
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 60.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                )
+            }
+            AnimatedContent(
+                targetState = unitySeconds,
+                label = "Decreasing unity seconds animation",
+                transitionSpec = { slideInVertically { -it } togetherWith slideOutVertically { it } }
+            ) { unitySeconds ->
+                Text(
+                    text = unitySeconds.toString(),
                     style = TextStyle(
                         color = Color.White,
                         fontSize = 60.sp,
