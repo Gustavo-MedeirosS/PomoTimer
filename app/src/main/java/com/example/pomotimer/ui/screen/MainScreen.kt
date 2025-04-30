@@ -50,6 +50,14 @@ fun MainScreen(
         }
     }
 
+    fun onPomofocusButtonStateClick() {
+        if (isTimerRunning || timer != totalTime) {
+            pomotimerViewModel.openAlertDialog()
+        } else {
+            pomotimerViewModel.changePomotimerState(context = context)
+        }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -58,7 +66,7 @@ fun MainScreen(
         if (isDialogOpened) {
             AlertDialog(
                 onDismissRequest = { pomotimerViewModel.closeAlertDialog() },
-                onConfirmClick = { pomotimerViewModel.changePomotimerState() },
+                onConfirmClick = { pomotimerViewModel.changePomotimerState(context = context) },
                 pomotimerState = pomodoroState
             )
         }
@@ -71,13 +79,7 @@ fun MainScreen(
                     currentColor = currentColor,
                     innerPadding = innerPadding,
                     pomodoroState = pomodoroState,
-                    onPomofocusButtonStateClick = {
-                        if (isTimerRunning) {
-                            pomotimerViewModel.openAlertDialog()
-                        } else {
-                            pomotimerViewModel.changePomotimerState()
-                        }
-                    },
+                    onPomofocusButtonStateClick = { onPomofocusButtonStateClick() },
                     isTimerRunning = isTimerRunning,
                     totalTime = totalTime,
                     timer = timer,
@@ -94,13 +96,7 @@ fun MainScreen(
                     currentColor = currentColor,
                     innerPadding = innerPadding,
                     pomodoroState = pomodoroState,
-                    onPomofocusButtonStateClick = {
-                        if (isTimerRunning) {
-                            pomotimerViewModel.openAlertDialog()
-                        } else {
-                            pomotimerViewModel.changePomotimerState()
-                        }
-                    },
+                    onPomofocusButtonStateClick = { onPomofocusButtonStateClick() },
                     isTimerRunning = isTimerRunning,
                     totalTime = totalTime,
                     timer = timer,

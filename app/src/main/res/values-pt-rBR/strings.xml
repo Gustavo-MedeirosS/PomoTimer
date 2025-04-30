@@ -20,8 +20,8 @@
     <!--  notification texts  -->
     <string name="ntf_silent_title_focus">Hora do foco</string>
     <string name="ntf_silent_title_break">Hora da pausa</string>
-    <string name="ntf_alarm_title_focus">Hora do foco!</string>
-    <string name="ntf_alarm_title_break">Hora da pausa!</string>
+    <string name="ntf_alert_title_focus">Hora do foco!</string>
+    <string name="ntf_alert_title_break">Hora da pausa!</string>
     <string name="ntf_msg_focus">Hora de voltar aos trabalhos</string>
     <string name="ntf_msg_break">Hora de dar uma pausa</string>
 </resources>

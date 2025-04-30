@@ -34,6 +34,7 @@ class MainActivity : ComponentActivity() {
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            Log.d("service", "service connected")
             val binder = service as PomotimerService.PomotimerBinder
             pomotimerService = binder.getService()
             pomotimerViewModel.setService(service = pomotimerService!!)
@@ -46,8 +47,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -65,14 +66,16 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        requestPermissions(Manifest.permission.POST_NOTIFICATIONS)
+        requestNotificationPermission()
     }
 
-    private fun requestPermissions(vararg permissions: String) {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestNotificationPermission() {
+        val permissions: Array<String> = arrayOf(Manifest.permission.POST_NOTIFICATIONS)
         val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) {}
-        requestPermissionLauncher.launch(permissions.asList().toTypedArray())
+        requestPermissionLauncher.launch(permissions)
     }
 
     override fun onStart() {
@@ -82,13 +85,18 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onDestroy() {
-        unbindService(connection)
+    override fun unbindService(conn: ServiceConnection) {
+        super.unbindService(conn)
         isBound = false
+        pomotimerViewModel.setService(service = null)
         pomotimerViewModel.triggerForegroundService(
             context = this@MainActivity,
             action = Constants.ACTION_SERVICE_CANCEL_NOTIFICATIONS
         )
+    }
+
+    override fun onDestroy() {
+        unbindService(connection)
         ViewModelProviderHelper.viewModel = null
         super.onDestroy()
     }

@@ -19,8 +19,8 @@
     <!--  notification texts  -->
     <string name="ntf_silent_title_focus">Focus Time</string>
     <string name="ntf_silent_title_break">Break Time</string>
-    <string name="ntf_alarm_title_focus">Focus Time!</string>
-    <string name="ntf_alarm_title_break">Break Time!</string>
+    <string name="ntf_alert_title_focus">Focus Time!</string>
+    <string name="ntf_alert_title_break">Break Time!</string>
     <string name="ntf_msg_focus">It\'s time to go back to work</string>
     <string name="ntf_msg_break">It\'s time to take a breath</string>
 

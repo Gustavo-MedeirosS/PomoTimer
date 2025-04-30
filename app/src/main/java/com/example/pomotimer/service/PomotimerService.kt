@@ -14,15 +14,17 @@ import com.example.pomotimer.Constants.ACTION_SERVICE_FINISH
 import com.example.pomotimer.Constants.ACTION_SERVICE_PAUSE
 import com.example.pomotimer.Constants.ACTION_SERVICE_RESUME
 import com.example.pomotimer.Constants.ACTION_SERVICE_START
-import com.example.pomotimer.Constants.ALARM_NOTIFICATION_CHANNEL_ID
-import com.example.pomotimer.Constants.ALARM_NOTIFICATION_ID
+import com.example.pomotimer.Constants.ALERT_NOTIFICATION_CHANNEL_ID
+import com.example.pomotimer.Constants.ALERT_NOTIFICATION_ID
 import com.example.pomotimer.Constants.NOTIFICATION_TIMER_FINISHED_NAME
 import com.example.pomotimer.Constants.NOTIFICATION_TIMER_UPDATES_NAME
 import com.example.pomotimer.Constants.SILENT_NOTIFICATION_CHANNEL_ID
 import com.example.pomotimer.Constants.SILENT_NOTIFICATION_ID
+import com.example.pomotimer.di.AlertNotificationBuilder
+import com.example.pomotimer.di.SilentNotificationBuilder
 import com.example.pomotimer.ui.PomotimerState
-import medeiros.dev.pomotimer.R
 import dagger.hilt.android.AndroidEntryPoint
+import medeiros.dev.pomotimer.R
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -32,7 +34,12 @@ class PomotimerService : Service() {
     lateinit var notificationManager: NotificationManager
 
     @Inject
-    lateinit var notificationBuilder: NotificationCompat.Builder
+    @SilentNotificationBuilder
+    lateinit var silentNotificationBuilder: NotificationCompat.Builder
+
+    @Inject
+    @AlertNotificationBuilder
+    lateinit var alertNotificationBuilder: NotificationCompat.Builder
 
     private val binder = PomotimerBinder()
 
@@ -48,22 +55,31 @@ class PomotimerService : Service() {
                     startForegroundService()
                     setPauseButton()
                     setFinishButton()
+                    cancelNotificationByChannelId(channelId = ALERT_NOTIFICATION_ID)
+                    notifyManager(notificationId = SILENT_NOTIFICATION_ID)
                 }
 
                 ACTION_SERVICE_PAUSE -> {
                     setResumeButton()
+                    notifyManager(notificationId = SILENT_NOTIFICATION_ID)
+                    stopForegroundService()
                 }
 
                 ACTION_SERVICE_RESUME -> {
                     setPauseButton()
                     setFinishButton()
+                    startForegroundService()
+                    notifyManager(notificationId = SILENT_NOTIFICATION_ID)
                 }
 
-                ACTION_SERVICE_FINISH -> {}
+                ACTION_SERVICE_FINISH -> {
+                    stopForegroundService()
+                    cancelNotificationByChannelId(channelId = SILENT_NOTIFICATION_ID)
+                }
 
                 ACTION_SERVICE_CANCEL_NOTIFICATIONS -> {
                     stopForegroundService()
-                    cancelNotifications()
+                    cancelAllNotifications()
                 }
             }
         }
@@ -71,102 +87,81 @@ class PomotimerService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    fun changePomotimerState() {
-        if (!isForegroundServiceRunning) {
-            startForegroundService()
-        }
-        removeFinishButton()
-    }
-
     private fun startForegroundService() {
         createNotificationChannels()
-        startForeground(SILENT_NOTIFICATION_ID, notificationBuilder.build())
+        startForeground(SILENT_NOTIFICATION_ID, silentNotificationBuilder.build())
         isForegroundServiceRunning = true
     }
 
     private fun stopForegroundService() {
-        notificationManager.cancelAll()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
         isForegroundServiceRunning = false
+        stopForeground(STOP_FOREGROUND_DETACH)
+        stopSelf()
     }
 
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val silentChannel = NotificationChannel(
-                SILENT_NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_TIMER_UPDATES_NAME,
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                enableVibration(false)
-            }
+            if (notificationManager.notificationChannels.isNotEmpty()) {
+                val silentChannel = NotificationChannel(
+                    SILENT_NOTIFICATION_CHANNEL_ID,
+                    NOTIFICATION_TIMER_UPDATES_NAME,
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    enableVibration(false)
+                }
 
-            val alertChannel = NotificationChannel(
-                ALARM_NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_TIMER_FINISHED_NAME,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                enableVibration(true)
-                vibrationPattern = longArrayOf(0, 500, 500, 500)
-                val soundUri = Uri.parse(
-                    "android.resource://com.example.pomotimer/" + R.raw.classic_alarm_clock_sound
-                )
-                setSound(soundUri, null)
-            }
+                val alertChannel = NotificationChannel(
+                    ALERT_NOTIFICATION_CHANNEL_ID,
+                    NOTIFICATION_TIMER_FINISHED_NAME,
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    enableVibration(true)
+                    vibrationPattern = longArrayOf(0, 500, 500, 500)
+                    val soundUri = Uri.parse(
+                        "android.resource://com.example.pomotimer/" + R.raw.classic_alarm_clock_sound
+                    )
+                    setSound(soundUri, null)
+                }
 
-            notificationManager.createNotificationChannels(listOf(silentChannel, alertChannel))
+                notificationManager.createNotificationChannels(listOf(silentChannel, alertChannel))
+            }
         }
     }
 
     fun updateSilentNotification(
-        pomotimerState: PomotimerState,
-        isTimerRunning: Boolean,
         totalTime: Int,
         timer: Int,
         minutes: Int,
         seconds: Int
     ) {
-        if (totalTime == timer) {
-            setStartButton()
-        }
-        if (pomotimerState == PomotimerState.FOCUS) setFocusTimeTitle() else setBreakTimeTitle()
-        if (isTimerRunning) {
-            setPauseButton()
-            setFinishButton()
-        }
-        notificationManager.notify(
-            SILENT_NOTIFICATION_ID,
-            notificationBuilder
-                .setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-                .setContentText(formatTimeForNotification(minutes, seconds))
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build()
-        )
+        silentNotificationBuilder
+            .setContentText(formatTimeForNotification(minutes, seconds))
+            .setProgress(totalTime, totalTime - timer, false)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+        notifyManager(notificationId = SILENT_NOTIFICATION_ID)
     }
 
-    fun updateAlarmNotification(pomotimerState: PomotimerState) {
-        notificationManager.cancel(ALARM_NOTIFICATION_ID)
-        notificationManager.notify(
-            ALARM_NOTIFICATION_ID,
-            notificationBuilder
-                .setChannelId(ALARM_NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(
-                    if (pomotimerState == PomotimerState.FOCUS) applicationContext.getString(R.string.ntf_alarm_title_focus)
-                    else applicationContext.getString(R.string.ntf_alarm_title_break)
-                )
-                .setContentText(
-                    if (pomotimerState == PomotimerState.FOCUS) applicationContext.getString(R.string.ntf_msg_focus)
-                    else applicationContext.getString(R.string.ntf_msg_break)
-                )
-                .setOngoing(false)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setProgress(0, 0, false)
-                .build()
-        )
+    fun showAlertNotification(pomotimerState: PomotimerState) {
+        setStartButton()
+        alertNotificationBuilder
+            .setContentTitle(
+                if (pomotimerState == PomotimerState.FOCUS) applicationContext.getString(R.string.ntf_alert_title_focus)
+                else applicationContext.getString(R.string.ntf_alert_title_break)
+            )
+            .setContentText(
+                if (pomotimerState == PomotimerState.FOCUS) applicationContext.getString(R.string.ntf_msg_focus)
+                else applicationContext.getString(R.string.ntf_msg_break)
+            )
+            .setOngoing(false)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setProgress(0, 0, false)
+            .build()
+        notifyManager(notificationId = ALERT_NOTIFICATION_ID)
     }
 
     @SuppressLint("DefaultLocale")
@@ -175,12 +170,11 @@ class PomotimerService : Service() {
     }
 
     @SuppressLint("RestrictedApi")
-    private fun setResumeButton() {
-        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-        if (notificationBuilder.mActions.size > 0) {
-            notificationBuilder.mActions.removeAt(0)
+    fun setResumeButton() {
+        if (silentNotificationBuilder.mActions.size > 0) {
+            silentNotificationBuilder.mActions.removeAt(0)
         }
-        notificationBuilder.mActions.add(
+        silentNotificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
                 0,
@@ -188,16 +182,14 @@ class PomotimerService : Service() {
                 ServiceHelper.resumePendingIntent(this)
             )
         )
-        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     @SuppressLint("RestrictedApi")
-    private fun setPauseButton() {
-        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-        if (notificationBuilder.mActions.size > 0) {
-            notificationBuilder.mActions.removeAt(0)
+    fun setPauseButton() {
+        if (silentNotificationBuilder.mActions.size > 0) {
+            silentNotificationBuilder.mActions.removeAt(0)
         }
-        notificationBuilder.mActions.add(
+        silentNotificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
                 0,
@@ -205,16 +197,14 @@ class PomotimerService : Service() {
                 ServiceHelper.pausePendingIntent(this)
             )
         )
-        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     @SuppressLint("RestrictedApi")
     private fun setStartButton() {
-        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-        if (notificationBuilder.mActions.size > 0) {
-            notificationBuilder.mActions.removeAt(0)
+        if (alertNotificationBuilder.mActions.size > 0) {
+            alertNotificationBuilder.mActions.removeAt(0)
         }
-        notificationBuilder.mActions.add(
+        alertNotificationBuilder.mActions.add(
             0,
             NotificationCompat.Action(
                 0,
@@ -222,14 +212,12 @@ class PomotimerService : Service() {
                 ServiceHelper.startPendingIntent(this)
             )
         )
-//        notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     @SuppressLint("RestrictedApi")
-    private fun setFinishButton() {
-        notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-        if (notificationBuilder.mActions.size == 1) {
-            notificationBuilder.mActions.add(
+    fun setFinishButton() {
+        if (silentNotificationBuilder.mActions.size == 1) {
+            silentNotificationBuilder.mActions.add(
                 1,
                 NotificationCompat.Action(
                     0,
@@ -237,50 +225,36 @@ class PomotimerService : Service() {
                     ServiceHelper.finishPendingIntent(this)
                 )
             )
-            notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
         }
     }
 
-    @SuppressLint("RestrictedApi")
-    fun removeFinishButton() {
-        if (notificationBuilder.mActions.size > 1) {
-            notificationBuilder.setChannelId(SILENT_NOTIFICATION_CHANNEL_ID)
-            notificationBuilder.mActions.removeAt(1)
-            notificationManager.notify(SILENT_NOTIFICATION_ID, notificationBuilder.build())
+    fun setSilentNotificationTitle(pomotimerState: PomotimerState) {
+        silentNotificationBuilder.setContentTitle(
+            if (pomotimerState == PomotimerState.FOCUS) applicationContext.getString(R.string.ntf_silent_title_focus)
+            else applicationContext.getString(R.string.ntf_silent_title_break)
+        ).build()
+    }
+
+    private fun notifyManager(notificationId: Int) {
+        when (notificationId) {
+            SILENT_NOTIFICATION_ID -> notificationManager.notify(
+                SILENT_NOTIFICATION_ID,
+                silentNotificationBuilder.build()
+            )
+
+            ALERT_NOTIFICATION_ID -> notificationManager.notify(
+                ALERT_NOTIFICATION_ID,
+                alertNotificationBuilder.build()
+            )
         }
     }
 
-    fun setFocusTimeTitle() {
-        notificationManager.notify(
-            SILENT_NOTIFICATION_ID,
-            notificationBuilder.setContentTitle(
-                applicationContext.getString(R.string.ntf_silent_title_focus)
-            ).build()
-        )
-    }
-
-    fun setBreakTimeTitle() {
-        notificationManager.notify(
-            SILENT_NOTIFICATION_ID,
-            notificationBuilder.setContentTitle(
-                applicationContext.getString(R.string.ntf_silent_title_break)
-            ).build()
-        )
-    }
-
-    private fun cancelNotifications() {
+    private fun cancelAllNotifications() {
         notificationManager.cancelAll()
     }
 
-    fun setProgressBarNotification(totalTime: Int, timer: Int) {
-        notificationManager.notify(
-            SILENT_NOTIFICATION_ID,
-            notificationBuilder.setProgress(
-                totalTime,
-                totalTime - timer,
-                false
-            ).build()
-        )
+    private fun cancelNotificationByChannelId(channelId: Int) {
+        notificationManager.cancel(channelId)
     }
 
     inner class PomotimerBinder : Binder() {
