@@ -7,7 +7,7 @@ import android.app.Service
 import android.content.Intent
 import android.net.Uri
 import android.os.Binder
-import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.pomotimer.Constants.ACTION_SERVICE_CANCEL_NOTIFICATIONS
 import com.example.pomotimer.Constants.ACTION_SERVICE_FINISH
@@ -100,8 +100,8 @@ class PomotimerService : Service() {
     }
 
     private fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (notificationManager.notificationChannels.isNotEmpty()) {
+        if (!areNotificationChannelsCreated()) {
+            try {
                 val silentChannel = NotificationChannel(
                     SILENT_NOTIFICATION_CHANNEL_ID,
                     NOTIFICATION_TIMER_UPDATES_NAME,
@@ -117,15 +117,33 @@ class PomotimerService : Service() {
                 ).apply {
                     enableVibration(true)
                     vibrationPattern = longArrayOf(0, 500, 500, 500)
-                    val soundUri = Uri.parse(
-                        "android.resource://com.example.pomotimer/" + R.raw.classic_alarm_clock_sound
-                    )
+                    val soundUri =
+                        Uri.parse("android.resource://${applicationContext.packageName}/${R.raw.classic_alarm_clock_sound}")
                     setSound(soundUri, null)
                 }
 
                 notificationManager.createNotificationChannels(listOf(silentChannel, alertChannel))
+            } catch (e: Exception) {
+                Log.e("debug", "createNotificationChannels: ERROR = ", e)
             }
         }
+    }
+
+    private fun areNotificationChannelsCreated(): Boolean {
+        if (notificationManager.notificationChannels.isEmpty()) return false
+
+        var isSilentChannelCreated = false
+        var isAlertChannelCreated = false
+
+        for (channel: NotificationChannel in notificationManager.notificationChannels) {
+            if (channel.id.equals(SILENT_NOTIFICATION_CHANNEL_ID)) {
+                isSilentChannelCreated = true
+            } else if (channel.id.equals(ALERT_NOTIFICATION_CHANNEL_ID)) {
+                isAlertChannelCreated = true
+            }
+        }
+
+        return isAlertChannelCreated && isSilentChannelCreated
     }
 
     fun updateSilentNotification(
